@@ -6,22 +6,25 @@
 </head>
 <body>
 
-    <!-- ✅ Navbar -->
+    <!-- Navbar -->
     <nav class="navbar">
         <div class="logo">📚 Library</div>
+
         <ul class="nav-links">
-            <li><a href="/">Home</a></li> <!-- 🔥 This is your Home button -->
+            <li><a href="/">Home</a></li>
             <li><a href="/Books">Books</a></li>
             <li><a href="/Dashboard">Dashboard</a></li>
-            <li><a href="/Account/Login">Login</a></li>
-            <li><a href="/Account/Register">Register</a></li>
+            <li><a href="/Identity/Account/Login">Login</a></li>
+            <li><a href="/Identity/Account/Register">Register</a></li>
         </ul>
     </nav>
 
-    <!-- ✅ Page Content -->
+    <!-- Page Content -->
     <div class="container">
         @RenderBody()
     </div>
+
+    @await RenderSectionAsync("Scripts", required: false)
 
 </body>
 </html>

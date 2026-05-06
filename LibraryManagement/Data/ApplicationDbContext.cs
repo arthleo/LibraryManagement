@@ -11,7 +11,7 @@ namespace LibraryManagement.Data
         {
         }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<User> LibraryUsers { get; set; }
         public DbSet<Library> Libraries { get; set; }
         public DbSet<Book> Books { get; set; }
         public DbSet<BorrowingConfig> BorrowingConfigs { get; set; }
