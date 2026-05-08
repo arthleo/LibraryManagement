@@ -1,67 +1,66 @@
 ﻿@model LibraryManagement.Models.Book
-
 @{
-    ViewData["Title"] = "Create";
+    ViewBag.Title = "Add New Book";
 }
 
-<h1>Create</h1>
+<div class="container mt-4">
+    <h2>📖 Add New Book</h2>
+    <hr />
 
-<h4>Book</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Author" class="control-label"></label>
-                <input asp-for="Author" class="form-control" />
-                <span asp-validation-for="Author" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Genre" class="control-label"></label>
-                <input asp-for="Genre" class="form-control" />
-                <span asp-validation-for="Genre" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ISBN" class="control-label"></label>
-                <input asp-for="ISBN" class="form-control" />
-                <span asp-validation-for="ISBN" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Summary" class="control-label"></label>
-                <input asp-for="Summary" class="form-control" />
-                <span asp-validation-for="Summary" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CoverImagePath" class="control-label"></label>
-                <input asp-for="CoverImagePath" class="form-control" />
-                <span asp-validation-for="CoverImagePath" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsAvailable" /> @Html.DisplayNameFor(model => model.IsAvailable)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="LibraryId" class="control-label"></label>
-                <select asp-for="LibraryId" class ="form-control" asp-items="ViewBag.LibraryId"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
+    <form method="post" action="/Books/Create" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label class="form-label">Book Title *</label>
+            <input type="text" name="Title" class="form-control" required />
+            <span class="text-danger">
+                @Html.ValidationMessageFor(m => m.Title)
+            </span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Author *</label>
+            <input type="text" name="Author" class="form-control" required />
+            <span class="text-danger">
+                @Html.ValidationMessageFor(m => m.Author)
+            </span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Genre *</label>
+            <input type="text" name="Genre" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">ISBN Number *</label>
+            <input type="text" name="ISBN" class="form-control" 
+                   minlength="10" maxlength="13" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Summary</label>
+            <textarea name="Summary" class="form-control" rows="3"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Upload Cover Image</label>
+            <input type="file" name="CoverImageFile" class="form-control" 
+                   accept="image/*" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Library ID *</label>
+            <input type="number" name="LibraryId" class="form-control" 
+                   value="1" required />
+        </div>
+
+        <div class="mb-3 form-check">
+            <input type="checkbox" name="IsAvailable" value="true" 
+                   class="form-check-input" checked id="isAvailable" />
+            <label class="form-check-label" for="isAvailable">Available</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Book</button>
+        <a href="/Books" class="btn btn-secondary">Cancel</a>
+    </form>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}

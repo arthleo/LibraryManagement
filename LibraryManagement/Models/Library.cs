@@ -6,26 +6,19 @@ namespace LibraryManagement.Models
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Library name is required")]
+        [Required]
         [StringLength(150)]
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
-        [Required(ErrorMessage = "Location is required")]
-        [StringLength(250)]
-        public string Location { get; set; }
+        [Required]
+        public required string Location { get; set; }
 
-        [Required(ErrorMessage = "Operating hours are required")]
-        [StringLength(200)]
-        [Display(Name = "Operating Hours")]
-        public string OperatingHours { get; set; }
+        public string? OperatingHours { get; set; }
+        public string? ContactDetails { get; set; }
+        public string? AdminId { get; set; }
 
-        [Required(ErrorMessage = "Contact details are required")]
-        [StringLength(200)]
-        [Display(Name = "Contact Details")]
-        public string ContactDetails { get; set; }
-
-        // Navigation
-        public ICollection<Book> Books { get; set; } = new List<Book>();
+        public ICollection<Book> Books { get; set; }
+            = new List<Book>();
         public BorrowingConfig? BorrowingConfig { get; set; }
     }
 }

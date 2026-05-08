@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using LibraryManagement.Data;
+﻿using LibraryManagement.Data;
 using LibraryManagement.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagement.Controllers
 {
@@ -19,146 +14,145 @@ namespace LibraryManagement.Controllers
             _context = context;
         }
 
-        // GET: Books
+        // LIST all books
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Books.Include(b => b.Library);
-            return View(await applicationDbContext.ToListAsync());
+            var books = await _context.Books.ToListAsync();
+            return View(books);
         }
 
-        // GET: Books/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // SHOW details
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var book = await _context.Books
-                .Include(b => b.Library)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (book == null)
-            {
-                return NotFound();
-            }
-
+            var book = await _context.Books.FindAsync(id);
+            if (book == null) return NotFound();
             return View(book);
         }
 
-        // GET: Books/Create
+        // SHOW create form
         public IActionResult Create()
         {
-            ViewData["LibraryId"] = new SelectList(_context.Libraries, "Id", "ContactDetails");
             return View();
         }
 
-        // POST: Books/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // SAVE new book
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Author,Genre,ISBN,Summary,CoverImagePath,IsAvailable,LibraryId")] Book book)
+        public async Task<IActionResult> Create(Book book)
         {
+            ModelState.Remove("Library");
+            ModelState.Remove("LibraryId");
+            ModelState.Remove("BorrowingTransactions");
+            ModelState.Remove("Feedbacks");
+            ModelState.Remove("CoverImageFile");
+
             if (ModelState.IsValid)
             {
-                _context.Add(book);
+                // Handle image upload
+                if (book.CoverImageFile != null)
+                {
+                    var uploadsFolder = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "wwwroot", "images");
+                    if (!Directory.Exists(uploadsFolder))
+                        Directory.CreateDirectory(uploadsFolder);
+
+                    var fileName = Guid.NewGuid().ToString()
+                        + Path.GetExtension(
+                            book.CoverImageFile.FileName);
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await book.CoverImageFile.CopyToAsync(stream);
+                    }
+                    book.CoverImagePath = "/images/" + fileName;
+                }
+
+                _context.Books.Add(book);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["LibraryId"] = new SelectList(_context.Libraries, "Id", "ContactDetails", book.LibraryId);
             return View(book);
         }
 
-        // GET: Books/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // SHOW edit form
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var book = await _context.Books.FindAsync(id);
-            if (book == null)
-            {
-                return NotFound();
-            }
-            ViewData["LibraryId"] = new SelectList(_context.Libraries, "Id", "ContactDetails", book.LibraryId);
+            if (book == null) return NotFound();
             return View(book);
         }
 
-        // POST: Books/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // SAVE edited book
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Author,Genre,ISBN,Summary,CoverImagePath,IsAvailable,LibraryId")] Book book)
+        public async Task<IActionResult> Edit(int id, Book book)
         {
-            if (id != book.Id)
-            {
-                return NotFound();
-            }
+            if (id != book.Id) return NotFound();
+
+            ModelState.Remove("Library");
+            ModelState.Remove("LibraryId");
+            ModelState.Remove("BorrowingTransactions");
+            ModelState.Remove("Feedbacks");
+            ModelState.Remove("CoverImageFile");
 
             if (ModelState.IsValid)
             {
-                try
+                if (book.CoverImageFile != null)
                 {
-                    _context.Update(book);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BookExists(book.Id))
+                    var uploadsFolder = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "wwwroot", "images");
+                    if (!Directory.Exists(uploadsFolder))
+                        Directory.CreateDirectory(uploadsFolder);
+
+                    var fileName = Guid.NewGuid().ToString()
+                        + Path.GetExtension(
+                            book.CoverImageFile.FileName);
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        return NotFound();
+                        await book.CoverImageFile.CopyToAsync(stream);
                     }
-                    else
-                    {
-                        throw;
-                    }
+                    book.CoverImagePath = "/images/" + fileName;
                 }
+
+                _context.Books.Update(book);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["LibraryId"] = new SelectList(_context.Libraries, "Id", "ContactDetails", book.LibraryId);
             return View(book);
         }
 
-        // GET: Books/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var book = await _context.Books
-                .Include(b => b.Library)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (book == null)
-            {
-                return NotFound();
-            }
-
-            return View(book);
-        }
-
-        // POST: Books/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        // DELETE book
+        public async Task<IActionResult> Delete(int id)
         {
             var book = await _context.Books.FindAsync(id);
-            if (book != null)
-            {
-                _context.Books.Remove(book);
-            }
-
+            if (book == null) return NotFound();
+            _context.Books.Remove(book);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool BookExists(int id)
+        // SEARCH books
+        public async Task<IActionResult> Search(string query)
         {
-            return _context.Books.Any(e => e.Id == id);
+            var results = await _context.Books
+                .Where(b => b.Title.Contains(query)
+                || b.Author.Contains(query))
+                .ToListAsync();
+            return View("Index", results);
+        }
+
+        // FILTER by genre
+        public async Task<IActionResult> FilterByGenre(string genre)
+        {
+            var results = await _context.Books
+                .Where(b => b.Genre == genre)
+                .ToListAsync();
+            return View("Index", results);
         }
     }
 }
