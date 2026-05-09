@@ -1,0 +1,87 @@
+﻿@model IEnumerable<LibraryManagement.Models.BorrowingTransaction>
+@{
+    ViewBag.Title = "Borrowing Report";
+}
+
+<div class="container mt-4">
+    <h2>📊 Borrowing Report</h2>
+    <hr />
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body text-center">
+                    <h3>@Model.Count()</h3>
+                    <p>Total Transactions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body text-center">
+                    <h3>@Model.Count(b => b.Status == "Borrowed")</h3>
+                    <p>Currently Borrowed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger">
+                <div class="card-body text-center">
+                    <h3>
+                        @Model.Count(b => b.DueDate < DateTime.Now
+                                                && b.Status == "Borrowed")
+                    </h3>
+                    <p>Overdue</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body text-center">
+                    <h3>$@Model.Sum(b => b.FineAmount)</h3>
+                    <p>Total Fines</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Book</th>
+                <th>Member</th>
+                <th>Borrowed</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Fine</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Book?.Title</td>
+                    <td>@item.User?.FullName</td>
+                    <td>@item.BorrowedAt.ToString("dd/MM/yyyy")</td>
+                    <td>@item.DueDate.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        @if (item.Status == "Borrowed"
+                                                            && item.DueDate < DateTime.Now)
+                        {
+                            <span class="badge bg-danger">Overdue</span>
+                        }
+                        else if (item.Status == "Borrowed")
+                        {
+                            <span class="badge bg-primary">Borrowed</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">Returned</span>
+                        }
+                    </td>
+                    <td>$@item.FineAmount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

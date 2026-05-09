@@ -6,8 +6,8 @@ namespace LibraryManagement.Models
     {
         public int Id { get; set; }
 
-        // FK
-        public int UserId { get; set; }
+        // FK - nullable to allow borrowing without user account
+        public int? UserId { get; set; }
         public User? User { get; set; }
 
         public int BookId { get; set; }
@@ -22,7 +22,6 @@ namespace LibraryManagement.Models
         [Display(Name = "Returned At")]
         public DateTime? ReturnedAt { get; set; }
 
-        // "Borrowed" | "Reserved" | "Returned" | "Overdue"
         [Required]
         [StringLength(20)]
         public string Status { get; set; } = "Borrowed";
