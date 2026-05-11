@@ -1,4 +1,6 @@
 @using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <!DOCTYPE html>
@@ -16,36 +18,77 @@
     <link rel="stylesheet"
           href="~/css/site.css"
           asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 
 <body>
 
     <!-- Navbar -->
     <nav class="navbar">
-
         <div class="logo">
-            📚 Library
+            <a asp-controller="Home"
+                   asp-action="Index"
+                   style="color:white; text-decoration:none;">
+                📚 Library
+            </a>
         </div>
 
         <ul class="nav-links">
 
             @if (User.Identity != null && User.Identity.IsAuthenticated)
             {
+                <!-- Library/Home -->
                 <li>
-                    <a href="/">Home</a>
+                    <a asp-controller="Home" asp-action="Index">
+                        Library
+                    </a>
                 </li>
 
+                <!-- Dashboard — points to Admin or Member based on role -->
                 <li>
-                    <a href="/Books">Books</a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-controller="Admin" asp-action="Index">
+                            Dashboard
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Member" asp-action="Index">
+                            Dashboard
+                        </a>
+                    }
                 </li>
 
-                
+                <!-- Books -->
+                <li>
+                    <a asp-controller="Books" asp-action="Index">
+                        Books
+                    </a>
+                </li>
 
+                <!-- Borrow -->
+                <li>
+                    <a asp-controller="Borrow" asp-action="Index">
+                        Borrow
+                    </a>
+                </li>
+
+                <!-- Feedback -->
+                <li>
+                    <a asp-controller="Feedback" asp-action="Index">
+                        Feedback
+                    </a>
+                </li>
+
+                <!-- Logout -->
                 <li>
                     <form method="post"
                           asp-area="Identity"
                           asp-page="/Account/Logout"
-                          asp-route-returnUrl="/">
+                          asp-route-returnUrl="/"
+                          style="display:inline;">
 
                         @Html.AntiForgeryToken()
 
@@ -57,12 +100,14 @@
             }
             else
             {
+                <!-- Login -->
                 <li>
                     <a href="/Identity/Account/Login">
                         Login
                     </a>
                 </li>
 
+                <!-- Register -->
                 <li>
                     <a href="/Identity/Account/Register">
                         Register
@@ -71,7 +116,6 @@
             }
 
         </ul>
-
     </nav>
 
     <!-- Main Content -->

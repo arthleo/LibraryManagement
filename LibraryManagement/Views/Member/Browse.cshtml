@@ -1,0 +1,128 @@
+@model IEnumerable<LibraryManagement.Models.Book>
+@{
+    ViewData["Title"] = "Browse Books";
+    var genres = ViewBag.Genres as IEnumerable<string> ?? [];
+    string? search = ViewBag.Search;
+    string? genre  = ViewBag.Genre;
+}
+
+<style>
+    .dash { padding: 2rem 1.5rem; background: #f5f0e8; min-height: calc(100vh - 64px); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .page-heading { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.03em; color: #111; margin: 0 0 0.25rem; }
+    .page-sub { font-size: 0.82rem; color: #666; margin: 0 0 1.5rem; }
+    .back-link { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #c0392b; text-decoration: none; border-bottom: 1.5px solid #c0392b; display: inline-block; margin-bottom: 1.5rem; }
+
+    /* Search bar */
+    .search-bar { display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .search-input { flex: 1; min-width: 200px; padding: 0.75rem; font-size: 0.9rem; border: 1.5px solid #000; border-radius: 0.5rem; box-shadow: 2.5px 3px 0 #000; outline: none; transition: ease 0.25s; font-family: inherit; }
+    .search-input:focus { box-shadow: 5px 6px 0 #000; }
+    .search-btn { padding: 0.75rem 1.25rem; background: #c0392b; color: #fff; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; border: 1.5px solid #000; border-radius: 0.5rem; box-shadow: 2.5px 3px 0 #000; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+    .search-btn:hover { box-shadow: 5px 6px 0 #000; transform: translate(-1px,-1px); }
+    .clear-btn { padding: 0.75rem 1rem; background: #fff; color: #111; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; border: 1.5px solid #000; border-radius: 0.5rem; box-shadow: 2.5px 3px 0 #000; cursor: pointer; transition: all 0.15s; font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; }
+
+    /* Genre filters */
+    .genre-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .genre-btn { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.3rem 0.7rem; border: 1.5px solid #000; background: #fff; cursor: pointer; text-decoration: none; color: #111; box-shadow: 2px 2px 0 #000; transition: all 0.15s; }
+    .genre-btn:hover, .genre-btn.active { background: #111; color: #fff; }
+    .genre-btn.active-red { background: #c0392b; color: #fff; }
+
+    /* Book grid */
+    .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1rem; }
+    .book-card { background: #fff; border: 2px solid #000; box-shadow: 3px 3px 0 #000; padding: 1rem; display: flex; flex-direction: column; gap: 0.4rem; transition: all 0.15s; }
+    .book-card:hover { box-shadow: 5px 5px 0 #000; transform: translate(-1px,-1px); }
+    .book-card--unavailable { opacity: 0.55; }
+    .book-card__genre  { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #c0392b; margin: 0; }
+    .book-card__title  { font-size: 0.9rem; font-weight: 700; color: #111; margin: 0; line-height: 1.3; }
+    .book-card__author { font-size: 0.78rem; color: #666; margin: 0; }
+    .book-card__isbn   { font-size: 0.68rem; color: #aaa; margin: 0; font-family: monospace; }
+    .book-card__lib    { font-size: 0.72rem; color: #999; margin: 0; }
+    .book-card__actions{ margin-top: auto; padding-top: 0.5rem; }
+    .badge { display: inline-block; font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.18rem 0.45rem; border: 1.5px solid #000; }
+    .badge--green { background: #27ae60; color: #fff; }
+    .badge--gray  { background: #ccc; color: #555; }
+    .btn { display: block; width: 100%; padding: 0.45rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; border: 1.5px solid #000; box-shadow: 2px 2px 0 #000; cursor: pointer; transition: all 0.15s ease; background: #fff; color: #111; text-align: center; box-sizing: border-box; font-family: inherit; }
+    .btn:hover { box-shadow: 4px 4px 0 #000; transform: translate(-1px,-1px); }
+    .btn--red { background: #c0392b; color: #fff; }
+    .btn--disabled { background: #eee; color: #aaa; cursor: not-allowed; box-shadow: none; pointer-events: none; }
+    .no-results { text-align: center; padding: 3rem; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; color: #666; }
+    .results-count { font-size: 0.78rem; color: #666; margin: 0 0 1rem; }
+</style>
+
+<div class="dash">
+    <a href="/Member" class="back-link">← Back to Dashboard</a>
+    <h1 class="page-heading">Browse Books</h1>
+    <p class="page-sub">Find your next read from the library collection.</p>
+
+    <!-- Search -->
+    <form method="get" action="/Member/Browse">
+        <div class="search-bar">
+            <input type="text" name="search" class="search-input"
+                   placeholder="Search by title or author..."
+                   value="@search" />
+            <input type="hidden" name="genre" value="@genre" />
+            <button type="submit" class="search-btn">Search</button>
+            @if (!string.IsNullOrEmpty(search) || !string.IsNullOrEmpty(genre))
+            {
+                <a href="/Member/Browse" class="clear-btn">✕ Clear</a>
+            }
+        </div>
+    </form>
+
+    <!-- Genre filter -->
+    <div class="genre-bar">
+        <a href="/Member/Browse@(!string.IsNullOrEmpty(search) ? $"?search={search}" : "")"
+           class="genre-btn @(string.IsNullOrEmpty(genre) ? "active" : "")">All</a>
+        @foreach (var g in genres)
+        {
+            <a href="/Member/Browse?genre=@Uri.EscapeDataString(g)@(!string.IsNullOrEmpty(search) ? $"&search={search}" : "")"
+               class="genre-btn @(genre == g ? "active-red" : "")">@g</a>
+        }
+    </div>
+
+    <p class="results-count">@Model.Count() book@(Model.Count() == 1 ? "" : "s") found</p>
+
+    @if (!Model.Any())
+    {
+        <div class="no-results">
+            <p style="font-size:1.5rem; margin:0 0 0.5rem">📚</p>
+            <p style="font-weight:700; margin:0 0 0.25rem">No books found</p>
+            <p style="font-size:0.82rem; margin:0">Try a different search or genre filter.</p>
+        </div>
+    }
+    else
+    {
+        <div class="book-grid">
+            @foreach (var b in Model)
+            {
+                <div class="book-card @(!b.IsAvailable ? "book-card--unavailable" : "")">
+                    <p class="book-card__genre">@b.Genre</p>
+                    <p class="book-card__title">@b.Title</p>
+                    <p class="book-card__author">@b.Author</p>
+                    <p class="book-card__isbn">ISBN @b.ISBN</p>
+                    <p class="book-card__lib">📍 @(b.Library?.Name ?? "—")</p>
+                    @if (b.IsAvailable)
+                    {
+                        <span class="badge badge--green" style="align-self:flex-start">Available</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge--gray" style="align-self:flex-start">Borrowed</span>
+                    }
+                    <div class="book-card__actions">
+                        @if (b.IsAvailable)
+                        {
+                            <form method="post" action="/Member/Borrow">
+                                <input type="hidden" name="bookId" value="@b.Id" />
+                                <button type="submit" class="btn btn--red">Borrow →</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <button class="btn btn--disabled">Unavailable</button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,301 @@
+@{
+    ViewData["Title"] = "My Library";
+    var activeLoans    = ViewBag.ActiveLoans    as IEnumerable<LibraryManagement.Models.BorrowingTransaction> ?? [];
+    var history        = ViewBag.History        as IEnumerable<LibraryManagement.Models.BorrowingTransaction> ?? [];
+    var availableBooks = ViewBag.AvailableBooks as IEnumerable<LibraryManagement.Models.Book> ?? [];
+    var myFeedbackIds  = ViewBag.MyFeedbackIds  as IEnumerable<int> ?? [];
+    decimal unpaidFines = ViewBag.UnpaidFines ?? 0m;
+    int overdueCount    = ViewBag.OverdueCount  ?? 0;
+}
+
+<style>
+    .dash { padding: 2rem 1.5rem; background: #f5f0e8; min-height: calc(100vh - 64px); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .page-heading { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.03em; color: #111; margin: 0 0 1.75rem; }
+
+    /* ── Alerts ── */
+    .alert { padding: 0.85rem 1rem; border: 2px solid #000; margin-bottom: 1.25rem; font-size: 0.85rem; font-weight: 600; box-shadow: 3px 3px 0 #000; }
+    .alert--red   { background: #fff5f5; color: #c0392b; border-color: #c0392b; box-shadow: 3px 3px 0 #c0392b; }
+    .alert--green { background: #f0fff4; color: #1a7a40; border-color: #27ae60; box-shadow: 3px 3px 0 #27ae60; }
+
+    /* ── Stat cards ── */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; padding: 1.1rem 1rem; }
+    .stat-card__label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #666; margin: 0 0 0.35rem; }
+    .stat-card__value { font-size: 1.75rem; font-weight: 900; color: #111; line-height: 1; margin: 0; }
+    .stat-card--red { background: #c0392b; }
+    .stat-card--red .stat-card__label,
+    .stat-card--red .stat-card__value { color: #fff; }
+
+    /* ── Section ── */
+    .section { margin-bottom: 2rem; }
+    .section__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+    .section__title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #333; margin: 0; }
+    .section__link  { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #c0392b; text-decoration: none; border-bottom: 1.5px solid #c0392b; }
+
+    /* ── Loan cards ── */
+    .loan-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .loan-card { background: #fff; border: 2px solid #000; box-shadow: 3px 3px 0 #000; padding: 1rem 1.1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .loan-card--overdue { border-color: #c0392b; box-shadow: 3px 3px 0 #c0392b; background: #fff5f5; }
+    .loan-card__title  { font-weight: 700; font-size: 0.9rem; color: #111; margin: 0 0 0.2rem; }
+    .loan-card__author { font-size: 0.78rem; color: #666; margin: 0; }
+    .loan-card__due    { font-size: 0.78rem; font-weight: 700; color: #333; white-space: nowrap; }
+    .loan-card__due--overdue { color: #c0392b; }
+
+    /* ── Book grid ── */
+    .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
+    .book-card { background: #fff; border: 2px solid #000; box-shadow: 3px 3px 0 #000; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; transition: all 0.15s; }
+    .book-card:hover { box-shadow: 5px 5px 0 #000; transform: translate(-1px,-1px); }
+    .book-card__genre  { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #c0392b; margin: 0; }
+    .book-card__title  { font-size: 0.9rem; font-weight: 700; color: #111; margin: 0; line-height: 1.3; }
+    .book-card__author { font-size: 0.78rem; color: #666; margin: 0; }
+    .book-card__library{ font-size: 0.72rem; color: #999; margin: 0; }
+    .book-card__actions{ margin-top: auto; display: flex; flex-direction: column; gap: 0.4rem; }
+
+    /* ── Badges ── */
+    .badge { display: inline-block; font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.18rem 0.45rem; border: 1.5px solid #000; }
+    .badge--red   { background: #c0392b; color: #fff; }
+    .badge--green { background: #27ae60; color: #fff; }
+    .badge--amber { background: #f39c12; color: #000; }
+
+    /* ── Buttons ── */
+    .btn { display: inline-block; width: 100%; padding: 0.45rem 0.75rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; border: 1.5px solid #000; box-shadow: 2px 2px 0 #000; cursor: pointer; text-decoration: none; transition: all 0.15s ease; background: #fff; color: #111; text-align: center; box-sizing: border-box; }
+    .btn:hover { box-shadow: 4px 4px 0 #000; transform: translate(-1px,-1px); }
+    .btn:active { box-shadow: 0 0 0 #000; transform: translate(2px,2px); }
+    .btn--red   { background: #c0392b; color: #fff; }
+    .btn--black { background: #111; color: #fff; }
+    .btn--disabled { background: #eee; color: #aaa; cursor: not-allowed; box-shadow: none; pointer-events: none; }
+
+    /* ── History table ── */
+    .data-table { width: 100%; border-collapse: collapse; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; }
+    .data-table th { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.65rem 1rem; background: #111; color: #fff; text-align: left; border-right: 1px solid #333; }
+    .data-table th:last-child { border-right: none; }
+    .data-table td { font-size: 0.85rem; padding: 0.65rem 1rem; border-bottom: 1px solid #e0dbd0; border-right: 1px solid #e0dbd0; color: #222; vertical-align: middle; }
+    .data-table td:last-child { border-right: none; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .empty-row { text-align: center; padding: 1.5rem !important; color: #999; font-size: 0.82rem; }
+
+    /* ── Feedback stars ── */
+    .star-row { display: flex; gap: 4px; }
+    .star { font-size: 1.2rem; cursor: pointer; color: #ddd; transition: color 0.1s; }
+    .star.selected, .star:hover { color: #c0392b; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @@media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+</style>
+
+<div class="dash">
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert--green">✓ @TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert--red">⚠ @TempData["Error"]</div>
+    }
+
+    <h1 class="page-heading">My Library</h1>
+
+    <!-- Stat row -->
+    <div class="stat-grid">
+        <div class="stat-card">
+            <p class="stat-card__label">Active Loans</p>
+            <p class="stat-card__value">@activeLoans.Count()</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-card__label">Books Read</p>
+            <p class="stat-card__value">@history.Count()</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-card__label">Available Now</p>
+            <p class="stat-card__value">@availableBooks.Count()</p>
+        </div>
+        @if (overdueCount > 0)
+        {
+            <div class="stat-card stat-card--red">
+                <p class="stat-card__label">Overdue</p>
+                <p class="stat-card__value">@overdueCount</p>
+            </div>
+        }
+        @if (unpaidFines > 0)
+        {
+            <div class="stat-card stat-card--red">
+                <p class="stat-card__label">Unpaid Fines</p>
+                <p class="stat-card__value">$@unpaidFines.ToString("0.00")</p>
+            </div>
+        }
+    </div>
+
+    <div class="two-col">
+        <!-- Active loans -->
+        <div class="section">
+            <div class="section__header">
+                <h2 class="section__title">Your Active Loans</h2>
+            </div>
+            <div class="loan-list">
+                @if (!activeLoans.Any())
+                {
+                    <div style="background:#fff; border:2px solid #000; box-shadow:3px 3px 0 #000; padding:1.5rem; text-align:center; color:#999; font-size:0.85rem;">
+                        No active loans. Browse books below to borrow!
+                    </div>
+                }
+                @foreach (var t in activeLoans)
+                {
+                    bool overdue = t.DueDate < DateTime.Now;
+                    int daysLeft = (int)(t.DueDate - DateTime.Now).TotalDays;
+                    <div class="loan-card @(overdue ? "loan-card--overdue" : "")">
+                        <div>
+                            <p class="loan-card__title">@(t.Book?.Title ?? "—")</p>
+                            <p class="loan-card__author">@(t.Book?.Author ?? "—")</p>
+                        </div>
+                        <div style="text-align:right">
+                            <p class="loan-card__due @(overdue ? "loan-card__due--overdue" : "")">
+                                @if (overdue)
+                                {
+                                    <span>@Math.Abs(daysLeft)d overdue</span>
+                                }
+                                else
+                                {
+                                    <span>Due in @daysLeft days</span>
+                                }
+                            </p>
+                            <p style="font-size:0.72rem; color:#999; margin:0.2rem 0 0">@t.DueDate.ToString("dd MMM yyyy")</p>
+                            @if (t.FineAmount > 0)
+                            {
+                                <span class="badge badge--red" style="margin-top:4px; display:inline-block">Fine: $@t.FineAmount.ToString("0.00")</span>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- History -->
+        <div class="section">
+            <div class="section__header">
+                <h2 class="section__title">Recent History</h2>
+                <a href="/Member/Browse" class="section__link">Browse all →</a>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Book</th>
+                        <th>Returned</th>
+                        <th>Feedback</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!history.Any())
+                    {
+                        <tr><td colspan="3" class="empty-row">No history yet</td></tr>
+                    }
+                    @foreach (var t in history)
+                    {
+                        bool hasFeedback = myFeedbackIds.Contains(t.BookId);
+                        <tr>
+                            <td>
+                                <div style="font-weight:600; font-size:0.85rem">@(t.Book?.Title ?? "—")</div>
+                                <div style="font-size:0.75rem; color:#999">@(t.Book?.Author ?? "")</div>
+                            </td>
+                            <td style="white-space:nowrap">@(t.ReturnedAt.HasValue ? t.ReturnedAt.Value.ToString("dd MMM yy") : "—")</td>
+                            <td>
+                                @if (hasFeedback)
+                                {
+                                    <span class="badge badge--green">✓ Done</span>
+                                }
+                                else
+                                {
+                                    <button class="btn" style="width:auto; padding:0.25rem 0.6rem; font-size:0.68rem"
+                                            onclick="openFeedback(@t.BookId, '@t.Book?.Title?.Replace("'","\\'")')">
+                                        Rate it
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Available books -->
+    <div class="section">
+        <div class="section__header">
+            <h2 class="section__title">Available Books</h2>
+            <a href="/Member/Browse" class="section__link">Browse all →</a>
+        </div>
+        <div class="book-grid">
+            @if (!availableBooks.Any())
+            {
+                <p style="color:#999; font-size:0.85rem">No books available right now.</p>
+            }
+            @foreach (var b in availableBooks)
+            {
+                <div class="book-card">
+                    <p class="book-card__genre">@b.Genre</p>
+                    <p class="book-card__title">@b.Title</p>
+                    <p class="book-card__author">@b.Author</p>
+                    <p class="book-card__library">📍 @(b.Library?.Name ?? "—")</p>
+                    <div class="book-card__actions">
+                        <form method="post" action="/Member/Borrow">
+                            <input type="hidden" name="bookId" value="@b.Id" />
+                            <button type="submit" class="btn btn--red">Borrow</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Feedback modal -->
+<div id="feedbackModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:999; align-items:center; justify-content:center;">
+    <div style="background:#fff; border:2px solid #000; box-shadow:6px 6px 0 #000; padding:2rem; max-width:380px; width:90%">
+        <h3 style="font-size:1rem; font-weight:900; margin:0 0 0.25rem" id="feedbackTitle">Rate this book</h3>
+        <p style="font-size:0.78rem; color:#666; margin:0 0 1.25rem">Share your thoughts to help other members.</p>
+        <form method="post" action="/Member/LeaveFeedback" id="feedbackForm">
+            <input type="hidden" name="bookId" id="feedbackBookId" />
+            <div style="margin-bottom:1rem">
+                <label style="font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#333; display:block; margin-bottom:0.4rem">Rating</label>
+                <div class="star-row" id="starRow">
+                    <span class="star" data-val="1" onclick="setRating(1)">★</span>
+                    <span class="star" data-val="2" onclick="setRating(2)">★</span>
+                    <span class="star" data-val="3" onclick="setRating(3)">★</span>
+                    <span class="star" data-val="4" onclick="setRating(4)">★</span>
+                    <span class="star" data-val="5" onclick="setRating(5)">★</span>
+                </div>
+                <input type="hidden" name="rating" id="ratingInput" value="0" />
+            </div>
+            <div style="margin-bottom:1.25rem">
+                <label style="font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#333; display:block; margin-bottom:0.4rem">Comment (optional)</label>
+                <textarea name="comment" rows="3" style="width:100%; padding:0.75rem; font-size:0.875rem; border:1.5px solid #000; border-radius:0.5rem; box-shadow:2.5px 3px 0 #000; outline:none; resize:vertical; font-family:inherit; box-sizing:border-box;" placeholder="What did you think?"></textarea>
+            </div>
+            <div style="display:flex; gap:0.75rem">
+                <button type="submit" class="btn btn--red" style="width:auto; flex:1">Submit</button>
+                <button type="button" class="btn" style="width:auto" onclick="closeFeedback()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openFeedback(bookId, title) {
+    document.getElementById('feedbackBookId').value = bookId;
+    document.getElementById('feedbackTitle').textContent = 'Rate: ' + title;
+    document.getElementById('ratingInput').value = 0;
+    document.querySelectorAll('.star').forEach(s => s.classList.remove('selected'));
+    document.getElementById('feedbackModal').style.display = 'flex';
+}
+function closeFeedback() {
+    document.getElementById('feedbackModal').style.display = 'none';
+}
+function setRating(val) {
+    document.getElementById('ratingInput').value = val;
+    document.querySelectorAll('.star').forEach(s => {
+        s.classList.toggle('selected', parseInt(s.dataset.val) <= val);
+    });
+}
+document.getElementById('feedbackModal').addEventListener('click', function(e) {
+    if (e.target === this) closeFeedback();
+});
+</script>
