@@ -1,71 +1,52 @@
-﻿@model LibraryManagement.Models.BorrowingTransaction
-
-@{
-    ViewData["Title"] = "Create";
+﻿@{
+    ViewBag.Title = "Borrow a Book";
 }
 
-<h1>Create</h1>
+<div class="container mt-4">
+    <h2>📖 Borrow a Book</h2>
+    <hr />
 
-<h4>BorrowingTransaction</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <select asp-for="UserId" class ="form-control" asp-items="ViewBag.UserId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="BookId" class="control-label"></label>
-                <select asp-for="BookId" class ="form-control" asp-items="ViewBag.BookId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="BorrowedAt" class="control-label"></label>
-                <input asp-for="BorrowedAt" class="form-control" />
-                <span asp-validation-for="BorrowedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DueDate" class="control-label"></label>
-                <input asp-for="DueDate" class="form-control" />
-                <span asp-validation-for="DueDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ReturnedAt" class="control-label"></label>
-                <input asp-for="ReturnedAt" class="form-control" />
-                <span asp-validation-for="ReturnedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FineAmount" class="control-label"></label>
-                <input asp-for="FineAmount" class="form-control" />
-                <span asp-validation-for="FineAmount" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="FinePaid" /> @Html.DisplayNameFor(model => model.FinePaid)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="RenewalsUsed" class="control-label"></label>
-                <input asp-for="RenewalsUsed" class="form-control" />
-                <span asp-validation-for="RenewalsUsed" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <form method="post" action="/BorrowingTransactions/BorrowBook">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label class="form-label">Select Book</label>
+
+            <select name="bookId"
+                    class="form-control"
+                    required>
+
+                <option value="">
+                    -- Select a Book --
+                </option>
+
+                @if (ViewBag.Books != null)
+                {
+                    @foreach (var book in ViewBag.Books)
+                    {
+                        <option value="@book.Id">
+                            @book.Title by @book.Author
+                        </option>
+                    }
+                }
+
+            </select>
+        </div>
+
+        <button type="submit"
+                class="btn btn-primary">
+            Borrow Book
+        </button>
+
+        <a href="/BorrowingTransactions"
+           class="btn btn-secondary">
+            Cancel
+        </a>
+
+    </form>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}

@@ -1,0 +1,105 @@
+﻿@model IEnumerable<LibraryManagement.Models.BorrowingTransaction>
+@{
+    ViewBag.Title = "My Borrows";
+}
+
+<div class="container mt-4">
+    <h2>📚 My Borrowed Books</h2>
+    <hr />
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Book Title</th>
+                <th>Borrowed Date</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Fine ($)</th>
+                <th>Renewals Used</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Book?.Title</td>
+                        <td>@item.BorrowedAt.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @item.DueDate.ToString("dd/MM/yyyy")
+                            @if (item.DueDate < DateTime.Now
+                                                && item.Status == "Borrowed")
+                            {
+                                <span class="badge bg-danger">Overdue!</span>
+                            }
+                        </td>
+                        <td>
+                            @if (item.Status == "Borrowed")
+                            {
+                                <span class="badge bg-primary">Borrowed</span>
+                            }
+                            else if (item.Status == "Returned")
+                            {
+                                <span class="badge bg-success">Returned</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">@item.Status</span>
+                            }
+                        </td>
+                        <td>$@item.FineAmount</td>
+                        <td>@item.RenewalsUsed / 2</td>
+                        <td>
+                            @if (item.Status == "Borrowed")
+                            {
+                                <form method="post"
+                                      action="/BorrowingTransactions/ReturnBook/@item.Id"
+                                      style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit"
+                                            class="btn btn-sm btn-success">
+                                        Return
+                                    </button>
+                                </form>
+
+                                @if (item.RenewalsUsed < 2)
+                                {
+                                    <form method="post"
+                                          action="/BorrowingTransactions/RenewBook/@item.Id"
+                                          style="display:inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit"
+                                                class="btn btn-sm btn-warning">
+                                            Renew
+                                        </button>
+                                    </form>
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center">
+                        No borrowed books found.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a href="/Books" class="btn btn-primary">Browse Books</a>
+</div>

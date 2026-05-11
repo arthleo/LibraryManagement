@@ -1,83 +1,94 @@
 ﻿@model IEnumerable<LibraryManagement.Models.BorrowingTransaction>
-
 @{
-    ViewData["Title"] = "Index";
+    ViewBag.Title = "All Transactions";
 }
 
-<h1>Index</h1>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>📋 All Borrowing Transactions</h2>
+        <div>
+            <a href="/BorrowingTransactions/OverdueBooks"
+               class="btn btn-danger">⚠️ Overdue Books</a>
+            <a href="/BorrowingTransactions/Report"
+               class="btn btn-info">📊 Report</a>
+        </div>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Book)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BorrowedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DueDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ReturnedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FineAmount)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FinePaid)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RenewalsUsed)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Book.Author)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BorrowedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DueDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReturnedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FineAmount)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FinePaid)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RenewalsUsed)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Book</th>
+                <th>Member</th>
+                <th>Borrowed</th>
+                <th>Due Date</th>
+                <th>Returned</th>
+                <th>Status</th>
+                <th>Fine ($)</th>
+                <th>Fine Paid</th>
+                <th>Renewals</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Book?.Title</td>
+                        <td>@item.User?.Email</td>
+                        <td>@item.BorrowedAt.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @item.DueDate.ToString("dd/MM/yyyy")
+                            @if (item.DueDate < DateTime.Now
+                                                && item.Status == "Borrowed")
+                            {
+                                <span class="badge bg-danger">Overdue</span>
+                            }
+                        </td>
+                        <td>
+                            @(item.ReturnedAt.HasValue ?
+                                                item.ReturnedAt.Value.ToString("dd/MM/yyyy")
+                                                : "-")
+                        </td>
+                        <td>
+                            @if (item.Status == "Borrowed")
+                            {
+                                <span class="badge bg-primary">Borrowed</span>
+                            }
+                            else if (item.Status == "Returned")
+                            {
+                                <span class="badge bg-success">Returned</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">
+                                    @item.Status
+                                </span>
+                            }
+                        </td>
+                        <td>$@item.FineAmount</td>
+                        <td>
+                            @if (item.FinePaid)
+                            {
+                                <span class="badge bg-success">Paid</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Unpaid</span>
+                            }
+                        </td>
+                        <td>@item.RenewalsUsed / 2</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="9" class="text-center">
+                        No transactions found.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

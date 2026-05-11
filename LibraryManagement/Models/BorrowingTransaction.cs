@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace LibraryManagement.Models
 {
@@ -6,9 +7,9 @@ namespace LibraryManagement.Models
     {
         public int Id { get; set; }
 
-        // FK
-        public int UserId { get; set; }
-        public User? User { get; set; }
+        // Connected to ASP.NET Identity user
+        public string? UserId { get; set; }
+        public IdentityUser? User { get; set; }
 
         public int BookId { get; set; }
         public Book? Book { get; set; }
@@ -22,7 +23,6 @@ namespace LibraryManagement.Models
         [Display(Name = "Returned At")]
         public DateTime? ReturnedAt { get; set; }
 
-        // "Borrowed" | "Reserved" | "Returned" | "Overdue"
         [Required]
         [StringLength(20)]
         public string Status { get; set; } = "Borrowed";
