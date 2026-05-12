@@ -1,7 +1,10 @@
-﻿using System;
+// FeedbacksController.cs
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +25,10 @@ namespace LibraryManagement.Controllers
         // GET: Feedbacks
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Feedbacks.Include(f => f.Book).Include(f => f.User);
+            var applicationDbContext = _context.Feedbacks
+                .Include(f => f.Book)
+                .Include(f => f.User);
+
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -38,6 +44,7 @@ namespace LibraryManagement.Controllers
                 .Include(f => f.Book)
                 .Include(f => f.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (feedback == null)
             {
                 return NotFound();
@@ -49,26 +56,37 @@ namespace LibraryManagement.Controllers
         // GET: Feedbacks/Create
         public IActionResult Create()
         {
-            ViewData["BookId"] = new SelectList(_context.Books, "Id", "Author");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email");
+            // Show book titles in the dropdown
+            ViewData["BookId"] = new SelectList(_context.Books, "Id", "Title");
             return View();
         }
 
         // POST: Feedbacks/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UserId,BookId,Rating,Comment,SubmittedAt")] Feedback feedback)
+        public async Task<IActionResult> Create([Bind("BookId,Rating,Comment")] Feedback feedback)
         {
             if (ModelState.IsValid)
             {
+                // Get the logged-in user's ID
+                feedback.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                // Set submission date/time automatically
+                feedback.SubmittedAt = DateTime.Now;
+
+                // Save to database
                 _context.Add(feedback);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BookId"] = new SelectList(_context.Books, "Id", "Author", feedback.BookId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email", feedback.UserId);
+
+            ViewData["BookId"] = new SelectList(
+                _context.Books,
+                "Id",
+                "Title",
+                feedback.BookId);
+
             return View(feedback);
         }
 
@@ -81,21 +99,33 @@ namespace LibraryManagement.Controllers
             }
 
             var feedback = await _context.Feedbacks.FindAsync(id);
+
             if (feedback == null)
             {
                 return NotFound();
             }
-            ViewData["BookId"] = new SelectList(_context.Books, "Id", "Author", feedback.BookId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email", feedback.UserId);
+
+            ViewData["BookId"] = new SelectList(
+                _context.Books,
+                "Id",
+                "Title",
+                feedback.BookId);
+
+            ViewData["UserId"] = new SelectList(
+                _context.Users,
+                "Id",
+                "Email",
+                feedback.UserId);
+
             return View(feedback);
         }
 
         // POST: Feedbacks/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,BookId,Rating,Comment,SubmittedAt")] Feedback feedback)
+        public async Task<IActionResult> Edit(
+            int id,
+            [Bind("Id,UserId,BookId,Rating,Comment,SubmittedAt")] Feedback feedback)
         {
             if (id != feedback.Id)
             {
@@ -115,15 +145,25 @@ namespace LibraryManagement.Controllers
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BookId"] = new SelectList(_context.Books, "Id", "Author", feedback.BookId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email", feedback.UserId);
+
+            ViewData["BookId"] = new SelectList(
+                _context.Books,
+                "Id",
+                "Title",
+                feedback.BookId);
+
+            ViewData["UserId"] = new SelectList(
+                _context.Users,
+                "Id",
+                "Email",
+                feedback.UserId);
+
             return View(feedback);
         }
 
@@ -139,6 +179,7 @@ namespace LibraryManagement.Controllers
                 .Include(f => f.Book)
                 .Include(f => f.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (feedback == null)
             {
                 return NotFound();
@@ -153,12 +194,13 @@ namespace LibraryManagement.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var feedback = await _context.Feedbacks.FindAsync(id);
+
             if (feedback != null)
             {
                 _context.Feedbacks.Remove(feedback);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
