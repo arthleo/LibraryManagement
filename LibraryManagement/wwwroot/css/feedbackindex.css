@@ -1,0 +1,95 @@
+/* Reuse same background */
+.feedback-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #F5F5DC;
+    padding: 40px 20px;
+}
+
+.feedback-card {
+    width: 100%;
+    max-width: 1100px;
+    background: #ffffff;
+    border: 2px solid #000;
+    box-shadow: 8px 8px 0 #000;
+    padding: 40px;
+}
+
+.wide-card {
+    max-width: 1200px;
+}
+.feedback-subtitle {
+    color: #ED7D3A;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.feedback-card h1 {
+    font-size: 42px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.feedback-text {
+    color: #666;
+    margin-bottom: 30px;
+}
+.submit-btn {
+    padding: 12px 24px;
+    background: #C73A2A;
+    color: white;
+    border: 2px solid #000;
+    border-radius: 12px;
+    font-weight: 700;
+    box-shadow: 4px 4px 0 #000;
+}
+
+.feedback-table {
+    margin-top: 20px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.feedback-table thead th {
+    background: #ED7D3A;
+    color: white;
+    padding: 12px;
+    text-align: center;
+}
+.feedback-table tbody td {
+    background: #fff;
+    padding: 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid #ddd;
+}
+
+.action-link {
+    color: #C73A2A;
+    font-weight: 600;
+    text-decoration: none;
+    margin-right: 8px;
+}
+
+.action-link:hover {
+    color: #ED7D3A;
+}
+
+.delete-link {
+    color: #b00020;
+}
+
+.bottom-links {
+    margin-top: 25px;
+}
+
+.bottom-links a {
+    color: #C73A2A;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 2px solid #C73A2A;
+}
