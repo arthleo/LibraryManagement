@@ -1,82 +1,122 @@
-﻿@{
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<section class="hero-card">
-    <h1>Welcome to Library Management System 📚</h1>
-    <p>This system allows users to browse and borrow books online.</p>
-</section>
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/home.css"
+          asp-append-version="true" />
+}
 
-<h2>Group Members</h2>
+<div class="home-page">
 
-<table class="custom-table">
-    <tr>
-        <th>Student ID</th>
-        <th>Last Name</th>
-        <th>First Name</th>
-    </tr>
-    <tr>
-        <td>20032259</td>
-        <td>Shakya</td>
-        <td>Namuna</td>
-    </tr>
-    <tr>
-        <td>234567</td>
-        <td>Lesmana</td>
-        <td>Arthur</td>
-    </tr>
-    <tr>
-        <td>345678</td>
-        <td>Rajput</td>
-        <td>Suhani</td>
-    </tr>
-    <tr>
-        <td>456789</td>
-        <td>Bhandari</td>
-        <td>Kishore</td>
-    </tr>
-</table>
+    <!-- Hero Section -->
+    <div class="home-card hero-card">
+        <p class="home-subtitle">LIBRARY MANAGEMENT SYSTEM</p>
+        <h1>Welcome to Library Management System 📚</h1>
+        <p class="home-text">
+            This system allows users to browse, manage, and borrow books online.
+        </p>
 
-<h2>📊 Library Summary</h2>
+        <div class="hero-buttons">
+            <a asp-area="Identity"
+               asp-page="/Account/Login"
+               class="primary-btn">
+                Login
+            </a>
 
-<div class="summary-container">
-    <div class="card">
-        <h3>Total Books</h3>
-        <p>6</p>
+            <a asp-area="Identity"
+               asp-page="/Account/Register"
+               class="secondary-btn">
+                Register
+            </a>
+        </div>
     </div>
 
-    <div class="card">
-        <h3>Available</h3>
-        <p>5</p>
+    <!-- Group Members -->
+    <div class="home-card">
+        <h2>Group Members</h2>
+
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Last Name</th>
+                    <th>First Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>20032259</td>
+                    <td>Shakya</td>
+                    <td>Namuna</td>
+                </tr>
+                <tr>
+                    <td>234567</td>
+                    <td>Lesmana</td>
+                    <td>Arthur</td>
+                </tr>
+                <tr>
+                    <td>345678</td>
+                    <td>Rajput</td>
+                    <td>Suhani</td>
+                </tr>
+                <tr>
+                    <td>456789</td>
+                    <td>Bhandari</td>
+                    <td>Kishore</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
-    <div class="card">
-        <h3>Borrowed</h3>
-        <p>1</p>
+    <!-- Library Summary -->
+    <div class="home-card">
+        <h2>📊 Library Summary</h2>
+
+        <div class="summary-container">
+            <div class="summary-box">
+                <h3>Total Books</h3>
+                <p>6</p>
+            </div>
+
+            <div class="summary-box">
+                <h3>Available</h3>
+                <p>5</p>
+            </div>
+
+            <div class="summary-box">
+                <h3>Borrowed</h3>
+                <p>1</p>
+            </div>
+        </div>
     </div>
+
+    <!-- Book Categories -->
+    <div class="home-card">
+        <h2>📚 Book Categories</h2>
+
+        <div class="book-container">
+            <div class="book-card">
+                <h3>Classic Fiction</h3>
+                <p>The Great Gatsby</p>
+            </div>
+
+            <div class="book-card">
+                <h3>Fantasy</h3>
+                <p>Harry Potter</p>
+            </div>
+
+            <div class="book-card">
+                <h3>Adventure</h3>
+                <p>The Jungle Book</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="home-footer">
+        <p>© 2026 KOI Library Management System</p>
+    </footer>
+
 </div>
-
-<h2>📚 Book Categories</h2>
-
-<div class="book-container">
-
-    <div class="book-card">
-        <h3>Classic Fiction</h3>
-        <p>The Great Gatsby</p>
-    </div>
-
-    <div class="book-card">
-        <h3>Fantasy</h3>
-        <p>Harry Potter</p>
-    </div>
-
-    <div class="book-card">
-        <h3>Adventure</h3>
-        <p>The Jungle Book</p>
-    </div>
-
-</div>
-
-<footer>
-    <p>© 2026 KOI Library Management System</p>
-</footer>
