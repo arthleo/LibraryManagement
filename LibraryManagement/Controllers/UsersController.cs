@@ -18,7 +18,7 @@ namespace LibraryManagement.Controllers
             _context = context;
         }
 
-        // GET: Users testhu
+        // GET: Users test
         public async Task<IActionResult> Index()
         {
             return View(await _context.LibraryUsers.ToListAsync());
