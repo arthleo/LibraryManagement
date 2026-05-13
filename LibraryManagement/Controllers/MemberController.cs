@@ -1,4 +1,5 @@
 using LibraryManagement.Data;
+using LibraryManagement.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,22 +19,16 @@ namespace LibraryManagement.Controllers
             _userManager = userManager;
         }
 
-        private async Task<LibraryManagement.Models.BorrowingConfig> GetConfigAsync()
+        private async Task<BorrowingConfig> GetConfigAsync()
         {
-            var config = await _db.BorrowingConfigs.FirstOrDefaultAsync();
-
-            if (config == null)
-            {
-                config = new LibraryManagement.Models.BorrowingConfig
+            return await _db.BorrowingConfigs.FirstOrDefaultAsync()
+                ?? new BorrowingConfig
                 {
                     LoanDurationDays = 14,
                     RenewalLimit = 2,
                     OverduePenaltyPerDay = 0.50m,
                     MaxBorrowableItems = 5
                 };
-            }
-
-            return config;
         }
 
         public async Task<IActionResult> Index()
@@ -61,26 +56,75 @@ namespace LibraryManagement.Controllers
                 .Take(12)
                 .ToListAsync();
 
-            var myFeedback = await _db.Feedbacks
-                .Where(f => f.UserId == userId)
-                .Select(f => f.BookId)
+            var reservations = await _db.Reservations
+                .Include(r => r.Book)
+                .Where(r => r.UserId == userId && r.Status == "Reserved")
+                .OrderByDescending(r => r.ReservedAt)
                 .ToListAsync();
-
-            var unpaidFines = await _db.BorrowingTransactions
-                .Where(t => t.UserId == userId && t.FineAmount > 0 && !t.FinePaid)
-                .SumAsync(t => t.FineAmount);
-
-            var overdueCount = activeLoans.Count(t => t.DueDate < DateTime.Now);
 
             ViewBag.ActiveLoans = activeLoans;
             ViewBag.History = history;
             ViewBag.AvailableBooks = availableBooks;
-            ViewBag.MyFeedbackIds = myFeedback;
-            ViewBag.UnpaidFines = unpaidFines;
-            ViewBag.OverdueCount = overdueCount;
+            ViewBag.MyReservations = reservations;
+
+            ViewBag.UnpaidFines = await _db.BorrowingTransactions
+                .Where(t => t.UserId == userId && t.FineAmount > 0 && !t.FinePaid)
+                .SumAsync(t => t.FineAmount);
+
+            ViewBag.OverdueCount = activeLoans.Count(t => t.DueDate < DateTime.Now);
             ViewBag.Config = config;
 
             return View();
+        }
+
+        public async Task<IActionResult> Browse(string? search, string? genre, string? availability)
+        {
+            var query = _db.Books
+                .Include(b => b.Library)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(b =>
+                    b.Title.Contains(search) ||
+                    b.Author.Contains(search) ||
+                    b.Genre.Contains(search));
+            }
+
+            if (!string.IsNullOrWhiteSpace(genre))
+            {
+                query = query.Where(b => b.Genre == genre);
+            }
+
+            if (!string.IsNullOrWhiteSpace(availability))
+            {
+                if (availability == "Available")
+                {
+                    query = query.Where(b => b.IsAvailable);
+                }
+                else if (availability == "Unavailable")
+                {
+                    query = query.Where(b => !b.IsAvailable);
+                }
+            }
+
+            var books = await query
+                .OrderBy(b => b.Title)
+                .ToListAsync();
+
+            var genres = await _db.Books
+                .Where(b => b.Genre != null && b.Genre != "")
+                .Select(b => b.Genre)
+                .Distinct()
+                .OrderBy(g => g)
+                .ToListAsync();
+
+            ViewBag.Genres = genres;
+            ViewBag.Search = search;
+            ViewBag.Genre = genre;
+            ViewBag.Availability = availability;
+
+            return View(books);
         }
 
         [HttpPost]
@@ -101,13 +145,19 @@ namespace LibraryManagement.Controllers
 
             var book = await _db.Books.FindAsync(bookId);
 
-            if (book == null || !book.IsAvailable)
+            if (book == null)
             {
-                TempData["Error"] = "This book is no longer available.";
-                return RedirectToAction("Index");
+                TempData["Error"] = "Book not found.";
+                return RedirectToAction("Browse");
             }
 
-            var transaction = new LibraryManagement.Models.BorrowingTransaction
+            if (!book.IsAvailable)
+            {
+                TempData["Error"] = "This book is not available. Please reserve it instead.";
+                return RedirectToAction("Browse");
+            }
+
+            var transaction = new BorrowingTransaction
             {
                 UserId = userId,
                 BookId = bookId,
@@ -122,9 +172,91 @@ namespace LibraryManagement.Controllers
             book.IsAvailable = false;
 
             _db.BorrowingTransactions.Add(transaction);
+
+            var existingReservation = await _db.Reservations
+                .FirstOrDefaultAsync(r =>
+                    r.UserId == userId &&
+                    r.BookId == bookId &&
+                    r.Status == "Reserved");
+
+            if (existingReservation != null)
+            {
+                existingReservation.Status = "Completed";
+            }
+
             await _db.SaveChangesAsync();
 
             TempData["Success"] = $"You borrowed \"{book.Title}\" for {config.LoanDurationDays} days.";
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reserve(int bookId)
+        {
+            var userId = _userManager.GetUserId(User);
+            var book = await _db.Books.FindAsync(bookId);
+
+            if (book == null)
+            {
+                TempData["Error"] = "Book not found.";
+                return RedirectToAction("Browse");
+            }
+
+            if (book.IsAvailable)
+            {
+                TempData["Error"] = "This book is available. You can borrow it now.";
+                return RedirectToAction("Browse");
+            }
+
+            var alreadyReserved = await _db.Reservations.AnyAsync(r =>
+                r.UserId == userId &&
+                r.BookId == bookId &&
+                r.Status == "Reserved");
+
+            if (alreadyReserved)
+            {
+                TempData["Error"] = "You already reserved this book.";
+                return RedirectToAction("Browse");
+            }
+
+            var reservation = new Reservation
+            {
+                UserId = userId,
+                BookId = bookId,
+                ReservedAt = DateTime.Now,
+                ExpiryDate = DateTime.Now.AddDays(3),
+                Status = "Reserved"
+            };
+
+            _db.Reservations.Add(reservation);
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = $"You reserved \"{book.Title}\".";
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelReservation(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            var reservation = await _db.Reservations.FirstOrDefaultAsync(r =>
+                r.Id == id &&
+                r.UserId == userId &&
+                r.Status == "Reserved");
+
+            if (reservation == null)
+            {
+                TempData["Error"] = "Reservation not found.";
+                return RedirectToAction("Index");
+            }
+
+            reservation.Status = "Cancelled";
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Reservation cancelled.";
             return RedirectToAction("Index");
         }
 
@@ -137,11 +269,15 @@ namespace LibraryManagement.Controllers
 
             var transaction = await _db.BorrowingTransactions
                 .Include(t => t.Book)
-                .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+                .FirstOrDefaultAsync(t =>
+                    t.Id == id &&
+                    t.UserId == userId &&
+                    t.Status == "Borrowed");
 
             if (transaction == null)
             {
-                return NotFound();
+                TempData["Error"] = "Borrow record not found.";
+                return RedirectToAction("Index");
             }
 
             if (transaction.RenewalsUsed >= config.RenewalLimit)
@@ -159,59 +295,6 @@ namespace LibraryManagement.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> Browse(string? search, string? genre)
-        {
-            var query = _db.Books.Include(b => b.Library).AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                query = query.Where(b =>
-                    b.Title.Contains(search) ||
-                    b.Author.Contains(search));
-            }
-
-            if (!string.IsNullOrWhiteSpace(genre))
-            {
-                query = query.Where(b => b.Genre == genre);
-            }
-
-            var books = await query.OrderBy(b => b.Title).ToListAsync();
-            var genres = await _db.Books.Select(b => b.Genre).Distinct().ToListAsync();
-
-            ViewBag.Genres = genres;
-            ViewBag.Search = search;
-            ViewBag.Genre = genre;
-
-            return View(books);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> LeaveFeedback(int bookId, int rating, string? comment)
-        {
-            var userId = _userManager.GetUserId(User);
-
-            var alreadyLeft = await _db.Feedbacks
-                .AnyAsync(f => f.UserId == userId && f.BookId == bookId);
-
-            if (!alreadyLeft)
-            {
-                _db.Feedbacks.Add(new LibraryManagement.Models.Feedback
-                {
-                    UserId = userId,
-                    BookId = bookId,
-                    Rating = rating,
-                    Comment = comment,
-                    SubmittedAt = DateTime.Now
-                });
-
-                await _db.SaveChangesAsync();
-
-                TempData["Success"] = "Thanks for your feedback!";
-            }
-
-            return RedirectToAction("Index");
-        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ReturnBook(int id)
@@ -234,6 +317,18 @@ namespace LibraryManagement.Controllers
             transaction.Status = "Returned";
             transaction.ReturnedAt = DateTime.Now;
 
+            if (transaction.DueDate < DateTime.Now)
+            {
+                var config = await GetConfigAsync();
+                var overdueDays = (DateTime.Now.Date - transaction.DueDate.Date).Days;
+
+                if (overdueDays > 0)
+                {
+                    transaction.FineAmount = overdueDays * config.OverduePenaltyPerDay;
+                    transaction.FinePaid = false;
+                }
+            }
+
             if (transaction.Book != null)
             {
                 transaction.Book.IsAvailable = true;
@@ -241,9 +336,43 @@ namespace LibraryManagement.Controllers
 
             await _db.SaveChangesAsync();
 
-            TempData["Success"] =
-                $"\"{transaction.Book?.Title}\" returned successfully.";
+            TempData["Success"] = $"\"{transaction.Book?.Title}\" returned successfully.";
+            return RedirectToAction("Index");
+        }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LeaveFeedback(int bookId, int rating, string? comment)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (rating < 1 || rating > 5)
+            {
+                TempData["Error"] = "Rating must be between 1 and 5.";
+                return RedirectToAction("Index");
+            }
+
+            var alreadyLeft = await _db.Feedbacks
+                .AnyAsync(f => f.UserId == userId && f.BookId == bookId);
+
+            if (alreadyLeft)
+            {
+                TempData["Error"] = "You already left feedback for this book.";
+                return RedirectToAction("Index");
+            }
+
+            _db.Feedbacks.Add(new Feedback
+            {
+                UserId = userId,
+                BookId = bookId,
+                Rating = rating,
+                Comment = comment,
+                SubmittedAt = DateTime.Now
+            });
+
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Thanks for your feedback!";
             return RedirectToAction("Index");
         }
     }

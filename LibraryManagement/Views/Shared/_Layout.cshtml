@@ -12,11 +12,9 @@
 
     <title>@ViewData["Title"] - Library Management</title>
 
-    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet" />
 
-    <!-- Site CSS -->
     <link rel="stylesheet"
           href="~/css/site.css"
           asp-append-version="true" />
@@ -26,10 +24,8 @@
 
 <body>
 
-    <!-- Navbar -->
     <nav class="navbar">
 
-        <!-- Logo -->
         <div class="logo">
             <a asp-controller="Home"
                asp-action="Index"
@@ -40,10 +36,8 @@
 
         <ul class="nav-links">
 
-            @if (User.Identity != null &&
-           User.Identity.IsAuthenticated)
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-                <!-- Home -->
                 <li>
                     <a asp-controller="Home"
                        asp-action="Index">
@@ -51,7 +45,6 @@
                     </a>
                 </li>
 
-                <!-- Library -->
                 <li>
                     <a asp-controller="Libraries"
                        asp-action="Index">
@@ -59,7 +52,6 @@
                     </a>
                 </li>
 
-                <!-- Admin Dashboard -->
                 @if (User.IsInRole("Admin"))
                 {
                     <li>
@@ -70,7 +62,6 @@
                     </li>
                 }
 
-                <!-- Books -->
                 <li>
                     <a asp-controller="Books"
                        asp-action="Index">
@@ -78,7 +69,6 @@
                     </a>
                 </li>
 
-                <!-- Borrow -->
                 <li>
                     @if (User.IsInRole("Admin"))
                     {
@@ -91,14 +81,30 @@
                     {
                         <a asp-controller="Member"
                            asp-action="Index">
-                            Borrow
+                            My Library
                         </a>
                     }
                 </li>
 
-                <!-- Borrow Config (Admin only) -->
+                @if (!User.IsInRole("Admin"))
+                {
+                    <li>
+                        <a asp-controller="Member"
+                           asp-action="Browse">
+                            Browse Books
+                        </a>
+                    </li>
+                }
+
                 @if (User.IsInRole("Admin"))
                 {
+                    <li>
+                        <a asp-controller="Reservations"
+                           asp-action="Index">
+                            Reservations
+                        </a>
+                    </li>
+
                     <li>
                         <a asp-controller="BorrowingConfigs"
                            asp-action="Index">
@@ -107,7 +113,6 @@
                     </li>
                 }
 
-                <!-- Feedback -->
                 <li>
                     <a asp-controller="Feedbacks"
                        asp-action="Index">
@@ -115,7 +120,6 @@
                     </a>
                 </li>
 
-                <!-- Users -->
                 @if (User.IsInRole("Admin"))
                 {
                     <li>
@@ -126,7 +130,6 @@
                     </li>
                 }
 
-                <!-- Logout -->
                 <li>
                     <form method="post"
                           asp-area="Identity"
@@ -145,14 +148,12 @@
             }
             else
             {
-                <!-- Login -->
                 <li>
                     <a href="/Identity/Account/Login">
                         Login
                     </a>
                 </li>
 
-                <!-- Register -->
                 <li>
                     <a href="/Identity/Account/Register">
                         Register
@@ -163,12 +164,10 @@
         </ul>
     </nav>
 
-    <!-- Main Content -->
     <div class="main-container">
         @RenderBody()
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)

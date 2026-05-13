@@ -1,0 +1,122 @@
+@model IEnumerable<LibraryManagement.Models.Reservation>
+
+@{
+    ViewData["Title"] = "Reservations";
+}
+
+<div class="container mt-4">
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>📌 Reservations</h2>
+    </div>
+
+    <p class="text-muted">
+        View and manage all book reservations made by members.
+    </p>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Book</th>
+                <th>Member</th>
+                <th>Reserved At</th>
+                <th>Expiry Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@(item.Book?.Title ?? "Unknown Book")</td>
+                        <td>@(item.User?.Email ?? "Unknown User")</td>
+                        <td>@item.ReservedAt.ToString("dd MMM yyyy")</td>
+                        <td>@item.ExpiryDate.ToString("dd MMM yyyy")</td>
+                        <td>
+                            @if (item.Status == "Reserved")
+                            {
+                                <span class="badge bg-warning text-dark">
+                                    Reserved
+                                </span>
+                            }
+                            else if (item.Status == "Completed")
+                            {
+                                <span class="badge bg-success">
+                                    Completed
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">
+                                    @item.Status
+                                </span>
+                            }
+                        </td>
+                        <td>
+                            @if (item.Status == "Reserved")
+                            {
+                                <form asp-action="Complete"
+                                      method="post"
+                                      style="display:inline;">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@item.Id" />
+
+                                    <button type="submit"
+                                            class="btn btn-sm btn-success">
+                                        Complete
+                                    </button>
+                                </form>
+
+                                <form asp-action="Cancel"
+                                      method="post"
+                                      style="display:inline;">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@item.Id" />
+
+                                    <button type="submit"
+                                            class="btn btn-sm btn-danger">
+                                        Cancel
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="text-muted">
+                                    No action
+                                </span>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6"
+                        class="text-center">
+                        No reservations found.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

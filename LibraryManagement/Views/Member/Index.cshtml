@@ -16,6 +16,11 @@
         as IEnumerable<LibraryManagement.Models.Book>
         ?? [];
 
+    var myReservations =
+        ViewBag.MyReservations
+        as IEnumerable<LibraryManagement.Models.Reservation>
+        ?? [];
+
     decimal unpaidFines =
         ViewBag.UnpaidFines ?? 0m;
 
@@ -167,6 +172,11 @@
         color: white;
     }
 
+    .btn--yellow {
+        background: #f1c40f;
+        color: #111;
+    }
+
     .loan-list {
         display: flex;
         flex-direction: column;
@@ -225,6 +235,17 @@
         border-top: 1px solid #ddd;
         font-size: 0.85rem;
     }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border: 1.5px solid #000;
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        background: #f1c40f;
+        color: #111;
+    }
 </style>
 
 <div class="dash">
@@ -255,6 +276,11 @@
         <div class="stat-card">
             <div class="stat-card__label">Available Books</div>
             <div class="stat-card__value">@availableBooks.Count()</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card__label">My Reservations</div>
+            <div class="stat-card__value">@myReservations.Count()</div>
         </div>
 
         <div class="stat-card">
@@ -310,6 +336,70 @@
 
     <div class="section">
         <div class="section__header">
+            <h2 class="section__title">My Reservations</h2>
+
+            <a href="/Member/Browse"
+               class="btn btn--yellow"
+               style="width:auto; padding:0.5rem 1rem; text-decoration:none;">
+                Browse More
+            </a>
+        </div>
+
+        <div class="table-box">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Book</th>
+                        <th>Author</th>
+                        <th>Reserved Date</th>
+                        <th>Expiry Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (!myReservations.Any())
+                    {
+                        <tr>
+                            <td colspan="6">You have no active reservations.</td>
+                        </tr>
+                    }
+
+                    @foreach (var r in myReservations)
+                    {
+                        <tr>
+                            <td>@(r.Book?.Title ?? "—")</td>
+                            <td>@(r.Book?.Author ?? "—")</td>
+                            <td>@r.ReservedAt.ToString("dd MMM yyyy")</td>
+                            <td>@r.ExpiryDate.ToString("dd MMM yyyy")</td>
+                            <td>
+                                <span class="status-badge">@r.Status</span>
+                            </td>
+                            <td>
+                                <form asp-controller="Member"
+                                      asp-action="CancelReservation"
+                                      asp-route-id="@r.Id"
+                                      method="post">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                            class="btn btn--red"
+                                            onclick="return confirm('Are you sure you want to cancel this reservation?');">
+                                        Cancel
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section__header">
             <h2 class="section__title">Recent History</h2>
 
             <a href="/Member/Browse"
@@ -354,6 +444,13 @@
         </div>
 
         <div class="book-grid">
+            @if (!availableBooks.Any())
+            {
+                <div class="book-card">
+                    <div class="book-card__title">No available books right now.</div>
+                </div>
+            }
+
             @foreach (var b in availableBooks)
             {
                 <div class="book-card">

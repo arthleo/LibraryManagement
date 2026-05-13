@@ -136,7 +136,7 @@
     }
 
     .book-card--unavailable {
-        opacity: 0.55;
+        opacity: 0.85;
     }
 
     .book-card__genre {
@@ -209,19 +209,17 @@
         color: #111;
         text-align: center;
         font-family: inherit;
+        cursor: pointer;
     }
 
     .btn--red {
         background: #c0392b;
         color: #fff;
-        cursor: pointer;
     }
 
-    .btn--disabled {
-        background: #eee;
-        color: #aaa;
-        cursor: not-allowed;
-        pointer-events: none;
+    .btn--black {
+        background: #111;
+        color: #fff;
     }
 
     .no-results {
@@ -242,6 +240,20 @@
 
 <div class="dash">
 
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
     <a href="/Member"
        class="back-link">
         ← Back to Dashboard
@@ -253,7 +265,6 @@
         Find your next read from the library collection.
     </p>
 
-    <!-- Search -->
     <form method="get" action="/Member/Browse">
 
         <div class="search-bar">
@@ -286,7 +297,6 @@
 
     </form>
 
-    <!-- Genre Filter -->
     <div class="genre-bar">
 
         <a href="/Member/Browse"
@@ -372,9 +382,22 @@
                         }
                         else
                         {
-                            <button class="btn btn--disabled">
-                                Unavailable
-                            </button>
+                            <form asp-controller="Member"
+                                  asp-action="Reserve"
+                                  method="post">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                       name="bookId"
+                                       value="@b.Id" />
+
+                                <button type="submit"
+                                        class="btn btn--black">
+                                    Reserve
+                                </button>
+
+                            </form>
                         }
 
                     </div>

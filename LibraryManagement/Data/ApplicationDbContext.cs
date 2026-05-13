@@ -16,12 +16,12 @@ namespace LibraryManagement.Data
         public DbSet<BorrowingConfig> BorrowingConfigs { get; set; }
         public DbSet<BorrowingTransaction> BorrowingTransactions { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // ── Decimal column types ──────────────────────────────
             modelBuilder.Entity<BorrowingConfig>()
                 .Property(b => b.OverduePenaltyPerDay)
                 .HasColumnType("decimal(10,2)");
@@ -30,20 +30,18 @@ namespace LibraryManagement.Data
                 .Property(b => b.FineAmount)
                 .HasColumnType("decimal(10,2)");
 
-            // ── BorrowingTransaction relationships ────────────────
             modelBuilder.Entity<BorrowingTransaction>()
-                .HasOne(b => b.User)
+                .HasOne(t => t.User)
                 .WithMany()
-                .HasForeignKey(b => b.UserId)
+                .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BorrowingTransaction>()
-                .HasOne(b => b.Book)
-                .WithMany()
-                .HasForeignKey(b => b.BookId)
+                .HasOne(t => t.Book)
+                .WithMany(b => b.BorrowingTransactions)
+                .HasForeignKey(t => t.BookId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // ── Feedback relationships ────────────────────────────
             modelBuilder.Entity<Feedback>()
                 .HasOne(f => f.User)
                 .WithMany()
@@ -52,8 +50,20 @@ namespace LibraryManagement.Data
 
             modelBuilder.Entity<Feedback>()
                 .HasOne(f => f.Book)
-                .WithMany()
+                .WithMany(b => b.Feedbacks)
                 .HasForeignKey(f => f.BookId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Reservation>()
+                .HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Reservation>()
+                .HasOne(r => r.Book)
+                .WithMany(b => b.Reservations)
+                .HasForeignKey(r => r.BookId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

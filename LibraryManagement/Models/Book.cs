@@ -46,6 +46,8 @@ namespace LibraryManagement.Models
 
         public ICollection<Feedback> Feedbacks { get; set; }
             = new List<Feedback>();
+        public ICollection<Reservation> Reservations { get; set; }
+    = new List<Reservation>();
 
         [NotMapped]
         [Display(Name = "Upload Cover Image")]
