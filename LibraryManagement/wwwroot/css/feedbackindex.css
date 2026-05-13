@@ -82,7 +82,7 @@
 .delete-link {
     color: #b00020;
 }
-
+/*
 .bottom-links {
     margin-top: 25px;
 }
@@ -92,4 +92,19 @@
     font-weight: 600;
     text-decoration: none;
     border-bottom: 2px solid #C73A2A;
+}*/
+.bottom-links {
+    margin-top: 25px;
 }
+
+    .bottom-links a {
+        color: #C73A2A;
+        font-weight: 600;
+        text-decoration: none;
+        border-bottom: 2px solid #C73A2A;
+    }
+
+        .bottom-links a:hover {
+            color: #ED7D3A;
+            border-color: #ED7D3A;
+        }

@@ -1,4 +1,4 @@
-```cshtml
+
 @model IEnumerable<LibraryManagement.Models.Feedback>
 
 @{
@@ -79,11 +79,17 @@
         }
 
         <!-- Back to Dashboard -->
-        <div class="button-group mt-4">
+        @* <div class="button-group mt-4">
             <a asp-controller="Home"
                asp-action="Dashboard"
                class="back-link">
                 ← Back to Dashboard
+            </a>
+        </div> *@
+        <div class="bottom-links">
+            <a asp-controller="Home"
+               asp-action="Dashboard">
+                Back to Dashboard
             </a>
         </div>
     </div>

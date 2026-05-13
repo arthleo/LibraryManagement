@@ -13,36 +13,47 @@
 <div class="feedback-page">
     <div class="feedback-card wide-card">
 
-        <p class="feedback-subtitle">LIBRARY MANAGEMENT SYSTEM</p>
+        <p class="feedback-subtitle">
+            LIBRARY MANAGEMENT SYSTEM
+        </p>
+
         <h1>All Books</h1>
+
         <p class="feedback-text">
             Browse, search, and manage all books in the library.
         </p>
 
-        <!-- Add New Book Button -->
-        <div class="text-center mb-4">
-            <a asp-action="Create"
-               class="submit-btn text-decoration-none d-inline-block">
-                + Add New Book
-            </a>
-        </div>
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="text-center mb-4">
+                <a asp-action="Create"
+                   class="submit-btn text-decoration-none d-inline-block">
+                    + Add New Book
+                </a>
+            </div>
+        }
 
         <!-- Search Box -->
         <form method="get"
               asp-action="Search"
               class="search-form">
+
             <input type="text"
                    name="query"
                    class="search-input"
                    placeholder="Search by title or author..." />
-            <button type="submit" class="search-btn">
+
+            <button type="submit"
+                    class="search-btn">
                 Search
             </button>
         </form>
 
         <!-- Books Table -->
         <div class="table-responsive">
+
             <table class="table feedback-table">
+
                 <thead>
                     <tr>
                         <th>Cover</th>
@@ -56,11 +67,13 @@
                 </thead>
 
                 <tbody>
+
                     @if (Model != null && Model.Any())
                     {
                         @foreach (var book in Model)
                         {
                             <tr>
+
                                 <td>
                                     @if (!string.IsNullOrEmpty(book.CoverImagePath))
                                     {
@@ -94,40 +107,51 @@
                                 </td>
 
                                 <td>
+
                                     <a asp-action="Details"
                                        asp-route-id="@book.Id"
                                        class="action-link">
                                         Details
                                     </a>
 
-                                    <a asp-action="Edit"
-                                       asp-route-id="@book.Id"
-                                       class="action-link">
-                                        Edit
-                                    </a>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <a asp-action="Edit"
+                                           asp-route-id="@book.Id"
+                                           class="action-link">
+                                            Edit
+                                        </a>
 
-                                    <a asp-action="Delete"
-                                       asp-route-id="@book.Id"
-                                       class="action-link delete-link">
-                                        Delete
-                                    </a>
+                                        <a asp-action="Delete"
+                                           asp-route-id="@book.Id"
+                                           class="action-link delete-link">
+                                            Delete
+                                        </a>
+                                    }
+
                                 </td>
+
                             </tr>
                         }
                     }
                     else
                     {
                         <tr>
-                            <td colspan="7" class="text-center">
-                                No books found. Click “Add New Book” to add one!
+                            <td colspan="7"
+                                class="text-center">
+
+                                No books found.
+
                             </td>
                         </tr>
                     }
+
                 </tbody>
+
             </table>
+
         </div>
 
-        <!-- Back Link -->
         <div class="bottom-links">
             <a asp-controller="Home"
                asp-action="Dashboard">

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagement.Controllers
 {
-    [Authorize(Roles = "Member")]
+    [Authorize]
     public class MemberController : Controller
     {
         private readonly ApplicationDbContext _db;

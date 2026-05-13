@@ -15,22 +15,26 @@
 
         <p class="feedback-subtitle">LIBRARY MANAGEMENT SYSTEM</p>
         <h1>Library List</h1>
+
         <p class="feedback-text">
             View and manage all library branches and their details.
         </p>
 
-        <!-- Create New Library Button -->
-        <div class="text-center mb-4">
-            <a asp-action="Create"
-               class="submit-btn text-decoration-none d-inline-block">
-                + Create New Library
-            </a>
-        </div>
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="text-center mb-4">
+                <a asp-action="Create"
+                   class="submit-btn text-decoration-none d-inline-block">
+                    + Create New Library
+                </a>
+            </div>
+        }
 
         @if (Model != null && Model.Any())
         {
             <div class="table-responsive">
                 <table class="table feedback-table">
+
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -49,28 +53,33 @@
                                 <td>@item.Location</td>
                                 <td>@item.OperatingHours</td>
                                 <td>@item.ContactDetails</td>
-                                <td>
-                                    <a asp-action="Edit"
-                                       asp-route-id="@item.Id"
-                                       class="action-link">
-                                        Edit
-                                    </a>
 
+                                <td>
                                     <a asp-action="Details"
                                        asp-route-id="@item.Id"
                                        class="action-link">
                                         Details
                                     </a>
 
-                                    <a asp-action="Delete"
-                                       asp-route-id="@item.Id"
-                                       class="action-link delete-link">
-                                        Delete
-                                    </a>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <a asp-action="Edit"
+                                           asp-route-id="@item.Id"
+                                           class="action-link">
+                                            Edit
+                                        </a>
+
+                                        <a asp-action="Delete"
+                                           asp-route-id="@item.Id"
+                                           class="action-link delete-link">
+                                            Delete
+                                        </a>
+                                    }
                                 </td>
                             </tr>
                         }
                     </tbody>
+
                 </table>
             </div>
         }
@@ -81,7 +90,6 @@
             </p>
         }
 
-        <!-- Back to Dashboard -->
         <div class="bottom-links">
             <a asp-controller="Home"
                asp-action="Dashboard">

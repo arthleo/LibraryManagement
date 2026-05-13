@@ -222,7 +222,16 @@
     <div class="section">
         <div class="section__header">
             <h2 class="section__title">Available Books</h2>
-            <a href="/Member/Browse" class="section__link">Browse all →</a>
+
+            <div style="display:flex; gap:10px; align-items:center;">
+
+                <a href="/Member/Browse"
+                   class="btn btn--red"
+                   style="width:auto; padding:0.5rem 1rem;">
+                    Browse Books
+                </a>
+
+            </div>
         </div>
         <div class="book-grid">
             @if (!availableBooks.Any())

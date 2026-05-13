@@ -1,10 +1,12 @@
 ﻿using LibraryManagement.Data;
 using LibraryManagement.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagement.Controllers
 {
+    [Authorize]
     public class BooksController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -25,11 +27,15 @@ namespace LibraryManagement.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var book = await _context.Books.FindAsync(id);
-            if (book == null) return NotFound();
+
+            if (book == null)
+                return NotFound();
+
             return View(book);
         }
 
         // SHOW create form
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -38,6 +44,7 @@ namespace LibraryManagement.Controllers
         // SAVE new book
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(Book book)
         {
             ModelState.Remove("Library");
@@ -53,43 +60,58 @@ namespace LibraryManagement.Controllers
                 {
                     var uploadsFolder = Path.Combine(
                         Directory.GetCurrentDirectory(),
-                        "wwwroot", "images");
-                    if (!Directory.Exists(uploadsFolder))
-                        Directory.CreateDirectory(uploadsFolder);
+                        "wwwroot",
+                        "images");
 
-                    var fileName = Guid.NewGuid().ToString()
-                        + Path.GetExtension(
-                            book.CoverImageFile.FileName);
-                    var filePath = Path.Combine(uploadsFolder, fileName);
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    var fileName =
+                        Guid.NewGuid().ToString()
+                        + Path.GetExtension(book.CoverImageFile.FileName);
+
+                    var filePath =
+                        Path.Combine(uploadsFolder, fileName);
 
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await book.CoverImageFile.CopyToAsync(stream);
                     }
+
                     book.CoverImagePath = "/images/" + fileName;
                 }
 
                 _context.Books.Add(book);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(book);
         }
 
         // SHOW edit form
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
             var book = await _context.Books.FindAsync(id);
-            if (book == null) return NotFound();
+
+            if (book == null)
+                return NotFound();
+
             return View(book);
         }
 
         // SAVE edited book
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, Book book)
         {
-            if (id != book.Id) return NotFound();
+            if (id != book.Id)
+                return NotFound();
 
             ModelState.Remove("Library");
             ModelState.Remove("LibraryId");
@@ -103,36 +125,50 @@ namespace LibraryManagement.Controllers
                 {
                     var uploadsFolder = Path.Combine(
                         Directory.GetCurrentDirectory(),
-                        "wwwroot", "images");
-                    if (!Directory.Exists(uploadsFolder))
-                        Directory.CreateDirectory(uploadsFolder);
+                        "wwwroot",
+                        "images");
 
-                    var fileName = Guid.NewGuid().ToString()
-                        + Path.GetExtension(
-                            book.CoverImageFile.FileName);
-                    var filePath = Path.Combine(uploadsFolder, fileName);
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    var fileName =
+                        Guid.NewGuid().ToString()
+                        + Path.GetExtension(book.CoverImageFile.FileName);
+
+                    var filePath =
+                        Path.Combine(uploadsFolder, fileName);
 
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await book.CoverImageFile.CopyToAsync(stream);
                     }
+
                     book.CoverImagePath = "/images/" + fileName;
                 }
 
                 _context.Books.Update(book);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(book);
         }
 
         // DELETE book
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var book = await _context.Books.FindAsync(id);
-            if (book == null) return NotFound();
+
+            if (book == null)
+                return NotFound();
+
             _context.Books.Remove(book);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -140,9 +176,11 @@ namespace LibraryManagement.Controllers
         public async Task<IActionResult> Search(string query)
         {
             var results = await _context.Books
-                .Where(b => b.Title.Contains(query)
-                || b.Author.Contains(query))
+                .Where(b =>
+                    b.Title.Contains(query) ||
+                    b.Author.Contains(query))
                 .ToListAsync();
+
             return View("Index", results);
         }
 
@@ -152,6 +190,7 @@ namespace LibraryManagement.Controllers
             var results = await _context.Books
                 .Where(b => b.Genre == genre)
                 .ToListAsync();
+
             return View("Index", results);
         }
     }
