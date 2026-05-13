@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibraryManagement.Data;
 using LibraryManagement.Models;
 
+
 namespace LibraryManagement.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class BorrowingConfigsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -22,39 +21,33 @@ namespace LibraryManagement.Controllers
         // GET: BorrowingConfigs
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.BorrowingConfigs.Include(b => b.Library);
-            return View(await applicationDbContext.ToListAsync());
+            var configs = await _context.BorrowingConfigs
+                .Include(b => b.Library)
+                .ToListAsync();
+            return View(configs);
         }
 
         // GET: BorrowingConfigs/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var borrowingConfig = await _context.BorrowingConfigs
+            var config = await _context.BorrowingConfigs
                 .Include(b => b.Library)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (borrowingConfig == null)
-            {
-                return NotFound();
-            }
 
-            return View(borrowingConfig);
+            if (config == null) return NotFound();
+            return View(config);
         }
 
         // GET: BorrowingConfigs/Create
         public IActionResult Create()
         {
-            ViewData["LibraryId"] = new SelectList(_context.Libraries, "Id", "ContactDetails");
+            ViewData["LibraryId"] = new SelectList(_context.Libraries, "Id", "Name");
             return View();
         }
 
         // POST: BorrowingConfigs/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,LoanDurationDays,RenewalLimit,OverduePenaltyPerDay,MaxBorrowableItems,LibraryId")] BorrowingConfig borrowingConfig)
@@ -65,38 +58,28 @@ namespace LibraryManagement.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["LibraryId"] = new SelectList(_context.Libraries, "Id", "ContactDetails", borrowingConfig.LibraryId);
+            ViewData["LibraryId"] = new SelectList(_context.Libraries, "Id", "Name", borrowingConfig.LibraryId);
             return View(borrowingConfig);
         }
 
         // GET: BorrowingConfigs/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var borrowingConfig = await _context.BorrowingConfigs.FindAsync(id);
-            if (borrowingConfig == null)
-            {
-                return NotFound();
-            }
-            ViewData["LibraryId"] = new SelectList(_context.Libraries, "Id", "ContactDetails", borrowingConfig.LibraryId);
-            return View(borrowingConfig);
+            var config = await _context.BorrowingConfigs.FindAsync(id);
+            if (config == null) return NotFound();
+
+            ViewData["LibraryId"] = new SelectList(_context.Libraries, "Id", "Name", config.LibraryId);
+            return View(config);
         }
 
         // POST: BorrowingConfigs/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,LoanDurationDays,RenewalLimit,OverduePenaltyPerDay,MaxBorrowableItems,LibraryId")] BorrowingConfig borrowingConfig)
         {
-            if (id != borrowingConfig.Id)
-            {
-                return NotFound();
-            }
+            if (id != borrowingConfig.Id) return NotFound();
 
             if (ModelState.IsValid)
             {
@@ -107,38 +90,26 @@ namespace LibraryManagement.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!BorrowingConfigExists(borrowingConfig.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!BorrowingConfigExists(borrowingConfig.Id)) return NotFound();
+                    else throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["LibraryId"] = new SelectList(_context.Libraries, "Id", "ContactDetails", borrowingConfig.LibraryId);
+            ViewData["LibraryId"] = new SelectList(_context.Libraries, "Id", "Name", borrowingConfig.LibraryId);
             return View(borrowingConfig);
         }
 
         // GET: BorrowingConfigs/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var borrowingConfig = await _context.BorrowingConfigs
+            var config = await _context.BorrowingConfigs
                 .Include(b => b.Library)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (borrowingConfig == null)
-            {
-                return NotFound();
-            }
 
-            return View(borrowingConfig);
+            if (config == null) return NotFound();
+            return View(config);
         }
 
         // POST: BorrowingConfigs/Delete/5
@@ -146,19 +117,13 @@ namespace LibraryManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var borrowingConfig = await _context.BorrowingConfigs.FindAsync(id);
-            if (borrowingConfig != null)
-            {
-                _context.BorrowingConfigs.Remove(borrowingConfig);
-            }
-
+            var config = await _context.BorrowingConfigs.FindAsync(id);
+            if (config != null) _context.BorrowingConfigs.Remove(config);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool BorrowingConfigExists(int id)
-        {
-            return _context.BorrowingConfigs.Any(e => e.Id == id);
-        }
+        private bool BorrowingConfigExists(int id) =>
+            _context.BorrowingConfigs.Any(e => e.Id == id);
     }
 }

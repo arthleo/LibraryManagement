@@ -26,7 +26,6 @@ namespace LibraryManagement.Models
         [Display(Name = "Max Borrowable Items")]
         public int MaxBorrowableItems { get; set; } = 5;
 
-        // FK
         public int LibraryId { get; set; }
         public Library? Library { get; set; }
     }
