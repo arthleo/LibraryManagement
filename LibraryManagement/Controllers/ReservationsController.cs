@@ -15,7 +15,6 @@ namespace LibraryManagement.Controllers
             _context = context;
         }
 
-        // Admin: view all reservations
         public async Task<IActionResult> Index()
         {
             var reservations = await _context.Reservations
@@ -27,7 +26,6 @@ namespace LibraryManagement.Controllers
             return View(reservations);
         }
 
-        // Admin: mark reservation as completed
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Complete(int id)
@@ -48,7 +46,6 @@ namespace LibraryManagement.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // Admin: cancel/delete reservation
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cancel(int id)

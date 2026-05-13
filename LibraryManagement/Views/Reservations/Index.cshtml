@@ -56,6 +56,12 @@
                                     Completed
                                 </span>
                             }
+                            else if (item.Status == "Cancelled")
+                            {
+                                <span class="badge bg-danger">
+                                    Cancelled
+                                </span>
+                            }
                             else
                             {
                                 <span class="badge bg-secondary">
@@ -66,7 +72,8 @@
                         <td>
                             @if (item.Status == "Reserved")
                             {
-                                <form asp-action="Complete"
+                                <form asp-controller="Reservations"
+                                      asp-action="Complete"
                                       method="post"
                                       style="display:inline;">
 
@@ -82,7 +89,8 @@
                                     </button>
                                 </form>
 
-                                <form asp-action="Cancel"
+                                <form asp-controller="Reservations"
+                                      asp-action="Cancel"
                                       method="post"
                                       style="display:inline;">
 
