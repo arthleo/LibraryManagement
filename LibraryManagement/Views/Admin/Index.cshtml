@@ -1,0 +1,228 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    var activeBorrows  = ViewBag.ActiveBorrows  as IEnumerable<LibraryManagement.Models.BorrowingTransaction> ?? [];
+    var overdueBorrows = ViewBag.OverdueBorrows as IEnumerable<LibraryManagement.Models.BorrowingTransaction> ?? [];
+    var recentFeedback = ViewBag.RecentFeedback as IEnumerable<LibraryManagement.Models.Feedback> ?? [];
+}
+
+<style>
+    .dash { padding: 2rem 1.5rem; background: #f5f0e8; min-height: calc(100vh - 64px); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+
+    /* ── Stat cards ── */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; padding: 1.25rem 1rem; }
+    .stat-card__label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #666; margin: 0 0 0.4rem; }
+    .stat-card__value { font-size: 2rem; font-weight: 900; color: #111; line-height: 1; margin: 0; }
+    .stat-card--red   { background: #c0392b; border-color: #000; }
+    .stat-card--red .stat-card__label,
+    .stat-card--red .stat-card__value { color: #fff; }
+
+    /* ── Section ── */
+    .section { margin-bottom: 2rem; }
+    .section__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+    .section__title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #333; margin: 0; }
+    .section__link { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #c0392b; text-decoration: none; border-bottom: 1.5px solid #c0392b; }
+
+    /* ── Table ── */
+    .data-table { width: 100%; border-collapse: collapse; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; }
+    .data-table th { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.65rem 1rem; background: #111; color: #fff; text-align: left; border-right: 1px solid #333; }
+    .data-table th:last-child { border-right: none; }
+    .data-table td { font-size: 0.85rem; padding: 0.65rem 1rem; border-bottom: 1px solid #e0dbd0; border-right: 1px solid #e0dbd0; color: #222; vertical-align: middle; }
+    .data-table td:last-child { border-right: none; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: #faf8f3; }
+
+    /* ── Badge ── */
+    .badge { display: inline-block; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.2rem 0.5rem; border: 1.5px solid #000; }
+    .badge--red    { background: #c0392b; color: #fff; }
+    .badge--green  { background: #27ae60; color: #fff; }
+    .badge--amber  { background: #f39c12; color: #000; }
+
+    /* ── Btn ── */
+    .btn { display: inline-block; padding: 0.35rem 0.75rem; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; border: 1.5px solid #000; box-shadow: 2px 2px 0 #000; cursor: pointer; text-decoration: none; transition: all 0.15s ease; background: #fff; color: #111; }
+    .btn:hover { box-shadow: 4px 4px 0 #000; transform: translate(-1px,-1px); }
+    .btn:active { box-shadow: 0 0 0 #000; transform: translate(2px,2px); }
+    .btn--red { background: #c0392b; color: #fff; border-color: #000; }
+
+    /* ── Two-col layout ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @@media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── Stars ── */
+    .stars { color: #c0392b; font-size: 0.85rem; }
+
+    .page-heading { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.03em; color: #111; margin: 0 0 1.75rem; }
+    .overdue-row td { background: #fff5f5 !important; }
+    .empty-row { text-align: center; padding: 1.5rem !important; color: #999; font-size: 0.82rem; }
+    .fine-warning { color: #c0392b; font-weight: 700; }
+</style>
+
+<div class="dash">
+    <h1 class="page-heading">Admin Dashboard</h1>
+
+    <!-- Stat cards -->
+    <div class="stat-grid">
+        <div class="stat-card">
+            <p class="stat-card__label">Total Books</p>
+            <p class="stat-card__value">@ViewBag.TotalBooks</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-card__label">Available</p>
+            <p class="stat-card__value">@ViewBag.AvailableBooks</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-card__label">Borrowed</p>
+            <p class="stat-card__value">@ViewBag.BorrowedBooks</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-card__label">Members</p>
+            <p class="stat-card__value">@ViewBag.TotalMembers</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-card__label">Libraries</p>
+            <p class="stat-card__value">@ViewBag.TotalLibraries</p>
+        </div>
+        @if ((int)ViewBag.OverdueCount > 0)
+        {
+            <div class="stat-card stat-card--red">
+                <p class="stat-card__label">Overdue</p>
+                <p class="stat-card__value">@ViewBag.OverdueCount</p>
+            </div>
+        }
+        @if ((decimal)ViewBag.UnpaidFines > 0)
+        {
+            <div class="stat-card stat-card--red">
+                <p class="stat-card__label">Unpaid Fines</p>
+                <p class="stat-card__value">$@ViewBag.UnpaidFines.ToString("0.00")</p>
+            </div>
+        }
+    </div>
+
+    <div class="two-col">
+        <!-- Active borrows -->
+        <div class="section">
+            <div class="section__header">
+                <h2 class="section__title">Active Borrows</h2>
+                <a href="/Admin/Transactions" class="section__link">View all →</a>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Book</th>
+                        <th>Member</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!activeBorrows.Any())
+                    {
+                        <tr><td colspan="4" class="empty-row">No active borrows</td></tr>
+                    }
+                    @foreach (var t in activeBorrows)
+                    {
+                        bool isOverdue = t.DueDate < DateTime.Now;
+                        <tr class="@(isOverdue ? "overdue-row" : "")">
+                            <td>@(t.Book?.Title ?? "—")</td>
+                            <td>@(t.User?.Email?.Split('@')[0] ?? "—")</td>
+                            <td>
+                                @t.DueDate.ToString("dd MMM yyyy")
+                                @if (isOverdue)
+                                {
+                                    <span class="badge badge--red" style="margin-left:4px">Overdue</span>
+                                }
+                            </td>
+                            <td><span class="badge badge--amber">Borrowed</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Recent feedback -->
+        <div class="section">
+            <div class="section__header">
+                <h2 class="section__title">Recent Feedback</h2>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Book</th>
+                        <th>User</th>
+                        <th>Rating</th>
+                        <th>Comment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!recentFeedback.Any())
+                    {
+                        <tr><td colspan="4" class="empty-row">No feedback yet</td></tr>
+                    }
+                    @foreach (var f in recentFeedback)
+                    {
+                        <tr>
+                            <td>@(f.Book?.Title ?? "—")</td>
+                            <td>@(f.User?.Email?.Split('@')[0] ?? "—")</td>
+                            <td><span class="stars">@string.Concat(Enumerable.Repeat("★", f.Rating))@string.Concat(Enumerable.Repeat("☆", 5 - f.Rating))</span></td>
+                            <td style="max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">@(f.Comment ?? "—")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Overdue section -->
+    @if (overdueBorrows.Any())
+    {
+        <div class="section">
+            <div class="section__header">
+                <h2 class="section__title">⚠ Overdue Books</h2>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Book</th>
+                        <th>Member</th>
+                        <th>Due Date</th>
+                        <th>Days Overdue</th>
+                        <th>Fine</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in overdueBorrows)
+                    {
+                        int daysOverdue = (int)(DateTime.Now - t.DueDate).TotalDays;
+                        <tr class="overdue-row">
+                            <td>@(t.Book?.Title ?? "—")</td>
+                            <td>@(t.User?.Email ?? "—")</td>
+                            <td>@t.DueDate.ToString("dd MMM yyyy")</td>
+                            <td><span class="fine-warning">@daysOverdue days</span></td>
+                            <td>@(t.FineAmount > 0 ? $"${t.FineAmount:0.00}" : "—")</td>
+                            <td>
+                                <form method="post" action="/Admin/MarkReturned" style="display:inline">
+                                    <input type="hidden" name="id" value="@t.Id" />
+                                    <button type="submit" class="btn btn--red">Mark Returned</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <!-- Quick links -->
+    <div class="section">
+        <div class="section__header">
+            <h2 class="section__title">Manage</h2>
+        </div>
+        <div style="display:flex; gap:0.75rem; flex-wrap:wrap">
+            <a href="/Admin/Users" class="btn">👤 Manage Users</a>
+            <a href="/Admin/Transactions" class="btn">📋 All Transactions</a>
+            <a href="/Books" class="btn">📚 Manage Books</a>
+            <a href="/Libraries" class="btn">🏛 Manage Libraries</a>
+        </div>
+    </div>
+</div>

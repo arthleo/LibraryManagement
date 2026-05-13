@@ -1,0 +1,63 @@
+@model LibraryManagement.Models.Feedback
+
+@{
+    ViewData["Title"] = "Create Feedback";
+}
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/feedback.css"
+          asp-append-version="true" />
+}
+
+<div class="feedback-page">
+    <div class="feedback-card">
+
+        <p class="feedback-subtitle">LIBRARY MANAGEMENT SYSTEM</p>
+        <h1>Create Feedback</h1>
+        <p class="feedback-text">Share your thoughts about the book.</p>
+
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Book -->
+            <div class="form-group-custom">
+                <label asp-for="BookId"></label>
+                <select asp-for="BookId"
+                        asp-items="ViewBag.BookId"
+                        class="form-input">
+                </select>
+                <span asp-validation-for="BookId" class="text-danger"></span>
+            </div>
+              <!-- Rating -->
+            <div class="form-group-custom">
+                <label asp-for="Rating"></label>
+                <input asp-for="Rating" class="form-input" />
+                <span asp-validation-for="Rating" class="text-danger"></span>
+            </div>
+
+            <!-- Comment -->
+            <div class="form-group-custom">
+                <label asp-for="Comment"></label>
+                <textarea asp-for="Comment"
+                          class="form-input textarea-input"
+                          rows="5"></textarea>
+                <span asp-validation-for="Comment" class="text-danger"></span>
+            </div>
+
+            <!-- Buttons -->
+            <button type="submit" class="submit-btn">
+                Submit Feedback →
+            </button>
+
+            <div class="bottom-links">
+             <a asp-action="Index">Back to List</a>
+                <a asp-controller="Home" asp-action="Dashboard">Dashboard</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

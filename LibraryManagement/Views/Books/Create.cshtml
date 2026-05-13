@@ -1,0 +1,105 @@
+@model LibraryManagement.Models.Book
+
+@{
+    ViewData["Title"] = "Add New Book";
+}
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/bookcreate.css"
+          asp-append-version="true" />
+}
+
+<div class="feedback-page">
+    <div class="feedback-card">
+
+        <p class="feedback-subtitle">LIBRARY MANAGEMENT SYSTEM</p>
+        <h1>Add New Book</h1>
+        <p class="feedback-text">
+            Enter the details of the new book to add it to the library.
+        </p>
+
+        <form method="post"
+              asp-action="Create"
+              enctype="multipart/form-data">
+
+            @Html.AntiForgeryToken()
+
+            <!-- Book Title -->
+            <div class="form-group-custom">
+                <label asp-for="Title">Book Title *</label>
+                <input asp-for="Title" class="form-input" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <!-- Author -->
+            <div class="form-group-custom">
+                <label asp-for="Author">Author *</label>
+                <input asp-for="Author" class="form-input" />
+                <span asp-validation-for="Author" class="text-danger"></span>
+            </div>
+
+            <!-- Genre -->
+            <div class="form-group-custom">
+                <label asp-for="Genre">Genre *</label>
+                <input asp-for="Genre" class="form-input" />
+            </div>
+
+            <!-- ISBN -->
+            <div class="form-group-custom">
+                <label asp-for="ISBN">ISBN Number *</label>
+                <input asp-for="ISBN"
+                       class="form-input"
+                       minlength="10"
+                       maxlength="13" />
+            </div>
+
+            <!-- Summary -->
+            <div class="form-group-custom">
+                <label asp-for="Summary">Summary</label>
+                <textarea asp-for="Summary"
+                          class="form-input textarea-input"
+                          rows="4"></textarea>
+            </div>
+
+            <!-- Cover Image -->
+            <div class="form-group-custom">
+                <label>Upload Cover Image</label>
+                <input type="file"
+                       name="CoverImageFile"
+                       class="form-input"
+                       accept="image/*" />
+            </div>
+
+            <!-- Library ID -->
+            <div class="form-group-custom">
+                <label asp-for="LibraryId">Library ID *</label>
+                <input asp-for="LibraryId"
+                       class="form-input"
+                       value="1" />
+            </div>
+
+            <!-- Availability -->
+            <div class="checkbox-group">
+                <input asp-for="IsAvailable" />
+                <label asp-for="IsAvailable">Available</label>
+            </div>
+
+            <!-- Buttons -->
+            <button type="submit" class="submit-btn">
+                Save Book →
+            </button>
+
+            <div class="bottom-links">
+                <a asp-action="Index">Back to Books</a>
+                <a asp-controller="Home" asp-action="Dashboard">
+                    Dashboard
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

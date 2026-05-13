@@ -1,0 +1,75 @@
+﻿@model LibraryManagement.Models.Book
+@{
+    ViewBag.Title = "Edit Book";
+}
+
+<div class="container mt-4">
+    <h2>✏️ Edit Book</h2>
+    <hr />
+
+    <form method="post" action="/Books/Edit/@Model.Id" 
+          enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@Model.Id" />
+        <input type="hidden" name="CoverImagePath" 
+               value="@Model.CoverImagePath" />
+
+        <div class="mb-3">
+            <label class="form-label">Book Title *</label>
+            <input type="text" name="Title" class="form-control" 
+                   value="@Model.Title" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Author *</label>
+            <input type="text" name="Author" class="form-control" 
+                   value="@Model.Author" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Genre *</label>
+            <input type="text" name="Genre" class="form-control" 
+                   value="@Model.Genre" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">ISBN Number *</label>
+            <input type="text" name="ISBN" class="form-control" 
+                   value="@Model.ISBN" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Summary</label>
+            <textarea name="Summary" class="form-control" 
+                      rows="3">@Model.Summary</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Upload New Cover Image</label>
+            <input type="file" name="CoverImageFile" 
+                   class="form-control" accept="image/*" />
+            @if (!string.IsNullOrEmpty(Model.CoverImagePath))
+            {
+                <img src="@Model.CoverImagePath" 
+                     style="width:80px;height:100px;margin-top:10px" />
+            }
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Library ID</label>
+            <input type="number" name="LibraryId" class="form-control" 
+                   value="@Model.LibraryId" required />
+        </div>
+
+        <div class="mb-3 form-check">
+            <input type="checkbox" name="IsAvailable" value="true" 
+                   class="form-check-input" 
+                   @(Model.IsAvailable ? "checked" : "") 
+                   id="isAvailable" />
+            <label class="form-check-label" for="isAvailable">Available</label>
+        </div>
+
+        <button type="submit" class="btn btn-warning">Save Changes</button>
+        <a href="/Books" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

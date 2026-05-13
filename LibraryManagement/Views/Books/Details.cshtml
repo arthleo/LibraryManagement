@@ -1,0 +1,67 @@
+﻿@model LibraryManagement.Models.Book
+@{
+    ViewBag.Title = "Book Details";
+}
+
+<div class="container mt-4">
+    <h2>📖 Book Details</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-3">
+            @if (!string.IsNullOrEmpty(Model.CoverImagePath))
+            {
+                <img src="@Model.CoverImagePath" 
+                     class="img-fluid rounded shadow" />
+            }
+            else
+            {
+                <div class="bg-secondary text-white text-center p-5 rounded">
+                    No Cover Image
+                </div>
+            }
+        </div>
+        <div class="col-md-9">
+            <table class="table table-bordered">
+                <tr>
+                    <th>Book Title</th>
+                    <td>@Model.Title</td>
+                </tr>
+                <tr>
+                    <th>Author</th>
+                    <td>@Model.Author</td>
+                </tr>
+                <tr>
+                    <th>Genre</th>
+                    <td>@Model.Genre</td>
+                </tr>
+                <tr>
+                    <th>ISBN</th>
+                    <td>@Model.ISBN</td>
+                </tr>
+                <tr>
+                    <th>Summary</th>
+                    <td>@Model.Summary</td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <td>
+                        @if (Model.IsAvailable)
+                        {
+                            <span class="badge bg-success">Available</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Not Available</span>
+                        }
+                    </td>
+                </tr>
+            </table>
+
+            <a href="/Books/Edit/@Model.Id" 
+               class="btn btn-warning">Edit</a>
+            <a href="/Books" 
+               class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+</div>

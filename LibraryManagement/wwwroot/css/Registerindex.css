@@ -1,0 +1,108 @@
+/* REGISTER PAGE */
+.register-page{
+    display:flex;
+    min-height:100vh;
+    background:#f4f6f9;
+}
+
+/* LEFT SIDE */
+.register-left{
+    flex:1;
+    background:#e67e22;
+    color:white;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:40px;
+}
+
+.register-left h1{
+    font-size:40px;
+    margin-bottom:20px;
+}
+
+.register-left p{
+    width:70%;
+    font-size:18px;
+    line-height:1.6;
+}
+
+.register-image{
+    width:50px;
+    margin-top:10px;
+}
+
+/* RIGHT SIDE */
+.register-right{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* CARD */
+.register-card{
+    width:400px;
+    background:white;
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.1);
+}
+
+.register-card h2{
+    text-align:center;
+    color:#e67e22;
+}
+
+.register-text{
+    text-align:center;
+    color:gray;
+    margin-bottom:25px;
+}
+
+/* INPUTS */
+.input-group{
+    margin-bottom:20px;
+}
+
+.input-group label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:bold;
+}
+
+.form-control{
+    width:100%;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:10px;
+}
+
+/* BUTTON */
+.register-btn{
+    width:100%;
+    background:#e67e22;
+    color:white;
+    border:none;
+    padding:12px;
+    border-radius:10px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.register-btn:hover{
+    background:#d35400;
+}
+
+/* LINKS */
+.register-links{
+    margin-top:20px;
+    text-align:center;
+}
+
+.register-links a{
+    text-decoration:none;
+    color:#3498db;
+}

@@ -1,0 +1,123 @@
+@{
+    ViewData["Title"] = "Manage Users";
+    var members = ViewBag.Members as IEnumerable<Microsoft.AspNetCore.Identity.IdentityUser> ?? [];
+    var admins  = ViewBag.Admins  as IEnumerable<Microsoft.AspNetCore.Identity.IdentityUser> ?? [];
+}
+
+<style>
+    .dash { padding: 2rem 1.5rem; background: #f5f0e8; min-height: calc(100vh - 64px); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .page-heading { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.03em; color: #111; margin: 0 0 0.25rem; }
+    .page-sub { font-size: 0.82rem; color: #666; margin: 0 0 2rem; }
+    .back-link { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #c0392b; text-decoration: none; border-bottom: 1.5px solid #c0392b; display: inline-block; margin-bottom: 1.5rem; }
+    .section { margin-bottom: 2rem; }
+    .section__title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #333; margin: 0 0 0.75rem; }
+    .data-table { width: 100%; border-collapse: collapse; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; }
+    .data-table th { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.65rem 1rem; background: #111; color: #fff; text-align: left; border-right: 1px solid #333; }
+    .data-table th:last-child { border-right: none; }
+    .data-table td { font-size: 0.85rem; padding: 0.65rem 1rem; border-bottom: 1px solid #e0dbd0; border-right: 1px solid #e0dbd0; color: #222; vertical-align: middle; }
+    .data-table td:last-child { border-right: none; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: #faf8f3; }
+    .badge { display: inline-block; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.2rem 0.5rem; border: 1.5px solid #000; }
+    .badge--red   { background: #c0392b; color: #fff; }
+    .badge--black { background: #111; color: #fff; }
+    .btn { display: inline-block; padding: 0.35rem 0.75rem; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; border: 1.5px solid #000; box-shadow: 2px 2px 0 #000; cursor: pointer; text-decoration: none; transition: all 0.15s ease; background: #fff; color: #111; }
+    .btn:hover { box-shadow: 4px 4px 0 #000; transform: translate(-1px,-1px); }
+    .btn:active { box-shadow: 0 0 0 #000; transform: translate(2px,2px); }
+    .btn--red   { background: #c0392b; color: #fff; border-color: #000; }
+    .btn--black { background: #111;    color: #fff; border-color: #000; }
+    .empty-row { text-align: center; padding: 1.5rem !important; color: #999; font-size: 0.82rem; }
+    .avatar { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: #111; color: #fff; font-size: 0.7rem; font-weight: 700; margin-right: 8px; vertical-align: middle; border: 1.5px solid #000; flex-shrink: 0; }
+    .avatar--red { background: #c0392b; }
+    .user-cell { display: flex; align-items: center; }
+</style>
+
+<div class="dash">
+    <a href="/Admin" class="back-link">← Back to Dashboard</a>
+    <h1 class="page-heading">Manage Users</h1>
+    <p class="page-sub">Promote members to admin or demote admins to member.</p>
+
+    <!-- Admins -->
+    <div class="section">
+        <h2 class="section__title">Admins — @admins.Count()</h2>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Email Confirmed</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!admins.Any())
+                {
+                    <tr><td colspan="4" class="empty-row">No admins found</td></tr>
+                }
+                @foreach (var u in admins)
+                {
+                    var initials = u.Email?.Substring(0, 1).ToUpper() ?? "?";
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <span class="avatar avatar--red">@initials</span>
+                                @u.Email
+                            </div>
+                        </td>
+                        <td>@(u.EmailConfirmed ? "✓ Yes" : "✗ No")</td>
+                        <td><span class="badge badge--red">Admin</span></td>
+                        <td>
+                            <form method="post" action="/Admin/DemoteToMember" style="display:inline"
+                                  onsubmit="return confirm('Demote this admin to Member?')">
+                                <input type="hidden" name="userId" value="@u.Id" />
+                                <button type="submit" class="btn">Demote to Member</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Members -->
+    <div class="section">
+        <h2 class="section__title">Members — @members.Count()</h2>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Email Confirmed</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!members.Any())
+                {
+                    <tr><td colspan="4" class="empty-row">No members yet</td></tr>
+                }
+                @foreach (var u in members)
+                {
+                    var initials = u.Email?.Substring(0, 1).ToUpper() ?? "?";
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <span class="avatar">@initials</span>
+                                @u.Email
+                            </div>
+                        </td>
+                        <td>@(u.EmailConfirmed ? "✓ Yes" : "✗ No")</td>
+                        <td><span class="badge badge--black">Member</span></td>
+                        <td>
+                            <form method="post" action="/Admin/PromoteToAdmin" style="display:inline"
+                                  onsubmit="return confirm('Promote this member to Admin?')">
+                                <input type="hidden" name="userId" value="@u.Id" />
+                                <button type="submit" class="btn btn--red">Promote to Admin</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

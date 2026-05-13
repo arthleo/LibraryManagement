@@ -1,0 +1,139 @@
+@model IEnumerable<LibraryManagement.Models.Book>
+
+@{
+    ViewData["Title"] = "All Books";
+}
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/booksindex.css"
+          asp-append-version="true" />
+}
+
+<div class="feedback-page">
+    <div class="feedback-card wide-card">
+
+        <p class="feedback-subtitle">LIBRARY MANAGEMENT SYSTEM</p>
+        <h1>All Books</h1>
+        <p class="feedback-text">
+            Browse, search, and manage all books in the library.
+        </p>
+
+        <!-- Add New Book Button -->
+        <div class="text-center mb-4">
+            <a asp-action="Create"
+               class="submit-btn text-decoration-none d-inline-block">
+                + Add New Book
+            </a>
+        </div>
+
+        <!-- Search Box -->
+        <form method="get"
+              asp-action="Search"
+              class="search-form">
+            <input type="text"
+                   name="query"
+                   class="search-input"
+                   placeholder="Search by title or author..." />
+            <button type="submit" class="search-btn">
+                Search
+            </button>
+        </form>
+
+        <!-- Books Table -->
+        <div class="table-responsive">
+            <table class="table feedback-table">
+                <thead>
+                    <tr>
+                        <th>Cover</th>
+                        <th>Book Title</th>
+                        <th>Author</th>
+                        <th>Genre</th>
+                        <th>ISBN</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var book in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(book.CoverImagePath))
+                                    {
+                                        <img src="@book.CoverImagePath"
+                                             class="book-cover" />
+                                    }
+                                    else
+                                    {
+                                        <span>No Image</span>
+                                    }
+                                </td>
+
+                                <td>@book.Title</td>
+                                <td>@book.Author</td>
+                                <td>@book.Genre</td>
+                                <td>@book.ISBN</td>
+
+                                <td>
+                                    @if (book.IsAvailable)
+                                    {
+                                        <span class="status-badge available">
+                                            Available
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge unavailable">
+                                            Not Available
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <a asp-action="Details"
+                                       asp-route-id="@book.Id"
+                                       class="action-link">
+                                        Details
+                                    </a>
+
+                                    <a asp-action="Edit"
+                                       asp-route-id="@book.Id"
+                                       class="action-link">
+                                        Edit
+                                    </a>
+
+                                    <a asp-action="Delete"
+                                       asp-route-id="@book.Id"
+                                       class="action-link delete-link">
+                                        Delete
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                No books found. Click “Add New Book” to add one!
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Back Link -->
+        <div class="bottom-links">
+            <a asp-controller="Home"
+               asp-action="Dashboard">
+                Back to Dashboard
+            </a>
+        </div>
+
+    </div>
+</div>

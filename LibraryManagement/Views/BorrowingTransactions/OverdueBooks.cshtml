@@ -1,0 +1,74 @@
+﻿@model IEnumerable<LibraryManagement.Models.BorrowingTransaction>
+@{
+    ViewBag.Title = "Overdue Books";
+}
+
+<div class="container mt-4">
+    <h2>⚠️ Overdue Books</h2>
+    <hr />
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-danger">
+            <tr>
+                <th>Book Title</th>
+                <th>Member</th>
+                <th>Due Date</th>
+                <th>Days Overdue</th>
+                <th>Fine ($)</th>
+                <th>Fine Paid</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var item in Model)
+                {
+                    int daysOverdue = (DateTime.Now - item.DueDate).Days;
+                    <tr class="table-danger">
+                        <td>@item.Book?.Title</td>
+                        <td>@item.User?.Email</td>
+                        <td>@item.DueDate.ToString("dd/MM/yyyy")</td>
+                        <td>@daysOverdue days</td>
+                        <td>$@item.FineAmount</td>
+                        <td>
+                            @if (item.FinePaid)
+                            {
+                                <span class="badge bg-success">Paid</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Unpaid</span>
+                            }
+                        </td>
+                        <td>
+                            @if (!item.FinePaid && item.FineAmount > 0)
+                            {
+                                <form method="post"
+                                      action="/BorrowingTransactions/MarkFinePaid/@item.Id"
+                                      style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit"
+                                            class="btn btn-sm btn-success">
+                                        Mark Fine Paid
+                                    </button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center text-success">
+                        No overdue books! 🎉
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a href="/BorrowingTransactions"
+       class="btn btn-secondary">Back to All Transactions</a>
+</div>

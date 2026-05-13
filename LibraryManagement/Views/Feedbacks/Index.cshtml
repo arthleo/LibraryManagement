@@ -1,0 +1,91 @@
+```cshtml
+@model IEnumerable<LibraryManagement.Models.Feedback>
+
+@{
+    ViewData["Title"] = "Feedback List";
+}
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/feedbackindex.css"
+          asp-append-version="true" />
+}
+
+<div class="feedback-page">
+    <div class="feedback-card">
+        <h1>Feedback List</h1>
+
+        <!-- Create New Feedback Button -->
+        <div class="button-group mb-4">
+            <a asp-action="Create"
+               class="submit-btn text-decoration-none">
+                + Create New Feedback
+            </a>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="feedback-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Book</th>
+                            <th>Rating</th>
+                            <th>Comment</th>
+                            <th>Submitted At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.User?.Email</td>
+                                <td>@item.Book?.Title</td>
+                                <td>@item.Rating</td>
+                                <td>@item.Comment</td>
+                                <td>@item.SubmittedAt.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <a asp-action="Edit"
+                                       asp-route-id="@item.Id"
+                                       class="action-link edit-link">
+                                        Edit
+                                    </a>
+
+                                    <a asp-action="Details"
+                                       asp-route-id="@item.Id"
+                                       class="action-link details-link">
+                                        Details
+                                    </a>
+
+                                    <a asp-action="Delete"
+                                       asp-route-id="@item.Id"
+                                       class="action-link delete-link">
+                                        Delete
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-center mt-4">
+                No feedback has been submitted yet.
+            </p>
+        }
+
+        <!-- Back to Dashboard -->
+        <div class="button-group mt-4">
+            <a asp-controller="Home"
+               asp-action="Dashboard"
+               class="back-link">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+```
