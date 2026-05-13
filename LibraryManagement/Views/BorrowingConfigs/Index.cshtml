@@ -1,59 +1,75 @@
 ﻿@model IEnumerable<LibraryManagement.Models.BorrowingConfig>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Borrowing Parameters";
 }
 
-<h1>Index</h1>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>⚙️ Borrowing Parameters</h2>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.LoanDurationDays)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RenewalLimit)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.OverduePenaltyPerDay)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MaxBorrowableItems)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Library)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.LoanDurationDays)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RenewalLimit)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OverduePenaltyPerDay)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MaxBorrowableItems)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Library.ContactDetails)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+        <a asp-action="Create" class="btn btn-primary">
+            + Add Config
+        </a>
+    </div>
+
+    <p class="text-muted">
+        Admin can configure loan duration, renewal limits, overdue penalties and maximum borrowable books.
+    </p>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Library</th>
+                <th>Loan Duration</th>
+                <th>Renewal Limit</th>
+                <th>Overdue Penalty</th>
+                <th>Max Borrowable Items</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@(item.Library?.Name ?? "No Library")</td>
+                        <td>@item.LoanDurationDays days</td>
+                        <td>@item.RenewalLimit</td>
+                        <td>$@item.OverduePenaltyPerDay.ToString("0.00") per day</td>
+                        <td>@item.MaxBorrowableItems books</td>
+                        <td>
+                            <a asp-action="Edit"
+                               asp-route-id="@item.Id"
+                               class="btn btn-sm btn-warning">
+                                Edit
+                            </a>
+
+                            <a asp-action="Details"
+                               asp-route-id="@item.Id"
+                               class="btn btn-sm btn-info">
+                                Details
+                            </a>
+
+                            <a asp-action="Delete"
+                               asp-route-id="@item.Id"
+                               class="btn btn-sm btn-danger">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center">
+                        No borrowing configuration found.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
