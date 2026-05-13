@@ -1,5 +1,6 @@
 ﻿@{
     ViewBag.Title = "Borrow a Book";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container mt-4">
@@ -10,43 +11,35 @@
     {
         <div class="alert alert-danger">@TempData["Error"]</div>
     }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
 
-    <form method="post" action="/BorrowingTransactions/BorrowBook">
+    <form method="post"
+          action="/BorrowingTransactions/BorrowBook">
         @Html.AntiForgeryToken()
 
         <div class="mb-3">
             <label class="form-label">Select Book</label>
-
-            <select name="bookId"
-                    class="form-control"
-                    required>
-
-                <option value="">
-                    -- Select a Book --
-                </option>
-
+            <select name="bookId" class="form-control" required>
+                <option value="">-- Select Book --</option>
                 @if (ViewBag.Books != null)
                 {
-                    @foreach (var book in ViewBag.Books)
+                    foreach (var book in
+                    (IEnumerable<LibraryManagement.Models.Book>)ViewBag.Books)
                     {
                         <option value="@book.Id">
                             @book.Title by @book.Author
                         </option>
                     }
                 }
-
             </select>
         </div>
 
-        <button type="submit"
-                class="btn btn-primary">
+        <button type="submit" class="btn btn-primary">
             Borrow Book
         </button>
-
-        <a href="/BorrowingTransactions"
-           class="btn btn-secondary">
-            Cancel
-        </a>
-
+        <a href="/Books" class="btn btn-secondary">Cancel</a>
     </form>
 </div>

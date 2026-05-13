@@ -16,194 +16,161 @@ namespace LibraryManagement.Controllers
             _context = context;
         }
 
-        // ADMIN - View all transactions
         public async Task<IActionResult> Index()
         {
             var transactions = await _context.BorrowingTransactions
                 .Include(b => b.Book)
-                .Include(b => b.User)
                 .ToListAsync();
-
             return View(transactions);
         }
 
-        // SHOW borrow form
         public async Task<IActionResult> Create()
         {
             var books = await _context.Books
                 .Where(b => b.IsAvailable)
                 .ToListAsync();
-
             ViewBag.Books = books;
-
             return View();
         }
 
-        // MEMBER - Borrow a book
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> BorrowBook(int bookId)
         {
-            var userId =
-                User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            var book = await _context.Books.FindAsync(bookId);
-
-            if (book == null || !book.IsAvailable)
+            try
             {
-                TempData["Error"] =
-                    "Book is not available.";
+                var book = await _context.Books.FindAsync(bookId);
+                if (book == null || !book.IsAvailable)
+                {
+                    TempData["Error"] = "Book is not available.";
+                    return RedirectToAction("Create");
+                }
 
+                var userId = User.FindFirstValue(
+                    ClaimTypes.NameIdentifier);
+
+                var borrow = new BorrowingTransaction
+                {
+                    BookId = bookId,
+                    UserId = userId,
+                    BorrowedAt = DateTime.Now,
+                    DueDate = DateTime.Now.AddDays(14),
+                    Status = "Borrowed",
+                    FineAmount = 0,
+                    FinePaid = false,
+                    RenewalsUsed = 0
+                };
+
+                book.IsAvailable = false;
+                _context.BorrowingTransactions.Add(borrow);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "Book borrowed successfully!";
+                return RedirectToAction("MyBorrows");
+            }
+            catch (Exception ex)
+            {
+                var innerMessage = ex.InnerException?.Message
+                    ?? "No inner exception";
+                TempData["Error"] =
+                    $"Error: {ex.Message} | Inner: {innerMessage}";
                 return RedirectToAction("Create");
             }
-
-            var borrow = new BorrowingTransaction
-            {
-                BookId = bookId,
-                UserId = userId,
-                BorrowedAt = DateTime.Now,
-                DueDate = DateTime.Now.AddDays(14),
-                Status = "Borrowed",
-                FineAmount = 0,
-                FinePaid = false,
-                RenewalsUsed = 0
-            };
-
-            book.IsAvailable = false;
-
-            _context.BorrowingTransactions.Add(borrow);
-
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] =
-                "Book borrowed successfully!";
-
-            return RedirectToAction("Index");
         }
 
-        // MEMBER - View their borrows
-        public async Task<IActionResult> MyBorrows(string userId)
+        public async Task<IActionResult> MyBorrows()
         {
+            var userId = User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
             var borrows = await _context.BorrowingTransactions
                 .Include(b => b.Book)
                 .Where(b => b.UserId == userId)
                 .ToListAsync();
-
             return View(borrows);
         }
 
-        // MEMBER - Return a book
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ReturnBook(int id)
         {
             var borrow = await _context.BorrowingTransactions
                 .Include(b => b.Book)
                 .FirstOrDefaultAsync(b => b.Id == id);
 
-            if (borrow == null)
-                return NotFound();
+            if (borrow == null) return NotFound();
 
             borrow.ReturnedAt = DateTime.Now;
             borrow.Status = "Returned";
 
             if (borrow.Book != null)
-            {
                 borrow.Book.IsAvailable = true;
-            }
 
-            // Calculate fine if overdue
             if (DateTime.Now > borrow.DueDate)
             {
-                int overdueDays =
-                    (DateTime.Now - borrow.DueDate).Days;
-
-                borrow.FineAmount =
-                    overdueDays * 1.00m;
+                int overdueDays = (DateTime.Now - borrow.DueDate).Days;
+                borrow.FineAmount = overdueDays * 1.00m;
             }
 
             await _context.SaveChangesAsync();
-
-            TempData["Success"] =
-                "Book returned successfully!";
-
-            return RedirectToAction("Index");
+            TempData["Success"] = "Book returned successfully!";
+            return RedirectToAction("MyBorrows");
         }
 
-        // MEMBER - Renew a book
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> RenewBook(int id)
         {
             var borrow = await _context.BorrowingTransactions
                 .FindAsync(id);
 
-            if (borrow == null)
-                return NotFound();
+            if (borrow == null) return NotFound();
 
             if (borrow.RenewalsUsed >= 2)
             {
-                TempData["Error"] =
-                    "Maximum renewals reached.";
-
-                return RedirectToAction("Index");
+                TempData["Error"] = "Maximum renewals reached.";
+                return RedirectToAction("MyBorrows");
             }
 
-            borrow.DueDate =
-                borrow.DueDate.AddDays(14);
-
+            borrow.DueDate = borrow.DueDate.AddDays(14);
             borrow.RenewalsUsed++;
-
             borrow.Status = "Borrowed";
 
             await _context.SaveChangesAsync();
-
-            TempData["Success"] =
-                "Book renewed successfully!";
-
-            return RedirectToAction("Index");
+            TempData["Success"] = "Book renewed successfully!";
+            return RedirectToAction("MyBorrows");
         }
 
-        // ADMIN - View overdue books
         public async Task<IActionResult> OverdueBooks()
         {
             var overdue = await _context.BorrowingTransactions
                 .Include(b => b.Book)
-                .Include(b => b.User)
-                .Where(b =>
-                    b.Status == "Borrowed"
+                .Where(b => b.Status == "Borrowed"
                     && b.DueDate < DateTime.Now)
                 .ToListAsync();
-
             return View(overdue);
         }
 
-        // ADMIN - Borrowing report
         public async Task<IActionResult> Report()
         {
             var report = await _context.BorrowingTransactions
                 .Include(b => b.Book)
-                .Include(b => b.User)
                 .OrderByDescending(b => b.BorrowedAt)
                 .ToListAsync();
-
             return View(report);
         }
 
-        // ADMIN - Mark fine as paid
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> MarkFinePaid(int id)
         {
             var borrow = await _context.BorrowingTransactions
                 .FindAsync(id);
-
-            if (borrow == null)
-                return NotFound();
+            if (borrow == null) return NotFound();
 
             borrow.FinePaid = true;
-
             await _context.SaveChangesAsync();
 
-            TempData["Success"] =
-                "Fine marked as paid!";
-
+            TempData["Success"] = "Fine marked as paid!";
             return RedirectToAction("Index");
         }
     }
