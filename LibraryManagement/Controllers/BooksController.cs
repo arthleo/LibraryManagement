@@ -26,7 +26,9 @@ namespace LibraryManagement.Controllers
         // SHOW details
         public async Task<IActionResult> Details(int id)
         {
-            var book = await _context.Books.FindAsync(id);
+            var book = await _context.Books
+                .Include(b => b.Library)
+                .FirstOrDefaultAsync(b => b.Id == id);
 
             if (book == null)
                 return NotFound();
@@ -68,12 +70,10 @@ namespace LibraryManagement.Controllers
                         Directory.CreateDirectory(uploadsFolder);
                     }
 
-                    var fileName =
-                        Guid.NewGuid().ToString()
-                        + Path.GetExtension(book.CoverImageFile.FileName);
+                    var fileName = Guid.NewGuid().ToString()
+                                   + Path.GetExtension(book.CoverImageFile.FileName);
 
-                    var filePath =
-                        Path.Combine(uploadsFolder, fileName);
+                    var filePath = Path.Combine(uploadsFolder, fileName);
 
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
@@ -121,6 +121,7 @@ namespace LibraryManagement.Controllers
 
             if (ModelState.IsValid)
             {
+                // Handle new image upload
                 if (book.CoverImageFile != null)
                 {
                     var uploadsFolder = Path.Combine(
@@ -133,12 +134,10 @@ namespace LibraryManagement.Controllers
                         Directory.CreateDirectory(uploadsFolder);
                     }
 
-                    var fileName =
-                        Guid.NewGuid().ToString()
-                        + Path.GetExtension(book.CoverImageFile.FileName);
+                    var fileName = Guid.NewGuid().ToString()
+                                   + Path.GetExtension(book.CoverImageFile.FileName);
 
-                    var filePath =
-                        Path.Combine(uploadsFolder, fileName);
+                    var filePath = Path.Combine(uploadsFolder, fileName);
 
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
@@ -157,16 +156,46 @@ namespace LibraryManagement.Controllers
             return View(book);
         }
 
-        // DELETE book
+        // SHOW delete confirmation page
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
+        {
+            var book = await _context.Books
+                .Include(b => b.Library)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (book == null)
+                return NotFound();
+
+            return View(book);
+        }
+
+        // DELETE book after confirmation
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var book = await _context.Books.FindAsync(id);
 
             if (book == null)
                 return NotFound();
 
+            // Delete related feedbacks
+            var feedbacks = await _context.Feedbacks
+                .Where(f => f.BookId == id)
+                .ToListAsync();
+            _context.Feedbacks.RemoveRange(feedbacks);
+
+            // Delete related borrowing transactions
+            var borrowings = await _context.BorrowingTransactions
+                .Where(b => b.BookId == id)
+                .ToListAsync();
+            _context.BorrowingTransactions.RemoveRange(borrowings);
+
+            // Delete the book
             _context.Books.Remove(book);
+
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
@@ -175,6 +204,11 @@ namespace LibraryManagement.Controllers
         // SEARCH books
         public async Task<IActionResult> Search(string query)
         {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
             var results = await _context.Books
                 .Where(b =>
                     b.Title.Contains(query) ||
