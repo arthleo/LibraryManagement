@@ -1,0 +1,218 @@
+/* wwwroot/css/booksedit.css */
+
+/* =========================
+   PAGE BACKGROUND
+========================= */
+body {
+    background-color: #F5F5DC; /* Cream */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.book-page {
+    padding: 60px 20px;
+}
+
+/* =========================
+   MAIN CARD
+========================= */
+.book-card {
+    max-width: 900px;          /* Wide card */
+    width: 100%;
+    margin: 0 auto;
+    background: #ffffff;
+    border: 3px solid #000;
+    box-shadow: 8px 8px 0 #000;
+    border-radius: 10px;
+    padding: 50px 70px;
+}
+
+/* =========================
+   HEADINGS
+========================= */
+.book-subtitle {
+    color: #ED7D3A;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.book-card h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #111;
+    margin-bottom: 10px;
+}
+
+.book-text {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 35px;
+}
+
+/* =========================
+   FORM GROUPS
+========================= */
+.form-group {
+    margin-bottom: 25px;
+}
+
+/* =========================
+   LABELS
+========================= */
+.form-label {
+    display: block;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+/* =========================
+   INPUTS
+========================= */
+.form-control {
+    width: 100%;
+    display: block;
+    box-sizing: border-box;
+
+    border: 3px solid #000;
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 16px;
+    background: #fff;
+    box-shadow: 4px 4px 0 #000;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #C63C2C;
+    box-shadow: 4px 4px 0 #000;
+}
+
+/* Textarea */
+textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* =========================
+   IMAGE PREVIEW
+========================= */
+.current-image {
+    margin-top: 12px;
+}
+
+/* Current Cover Image Preview */
+/* Force smaller cover image size */
+.current-image img,
+img.current-cover,
+.book-card img {
+    width: 80px !important;
+    height: 85px !important;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #ccc;
+    margin-top: 10px;
+    display: block;
+}
+
+/* =========================
+   CHECKBOX
+========================= */
+.form-check {
+    margin: 20px 0 30px;
+}
+
+.form-check-input {
+    margin-right: 8px;
+}
+
+.form-check-label {
+    font-weight: 600;
+    color: #333;
+}
+
+/* =========================
+   VALIDATION
+========================= */
+.text-danger {
+    display: block;
+    margin-top: 6px;
+    font-size: 14px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.button-group {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+.submit-btn,
+.cancel-btn {
+    display: inline-block;
+    padding: 14px 30px;
+    border-radius: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    border: 3px solid #000;
+    box-shadow: 4px 4px 0 #000;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+/* Save button */
+.submit-btn {
+    background-color: #C63C2C;
+    color: #fff;
+}
+
+.submit-btn:hover {
+    background-color: #a92f23;
+    color: #fff;
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #000;
+}
+
+/* Cancel button */
+.cancel-btn {
+    background-color: #fff;
+    color: #333;
+}
+
+.cancel-btn:hover {
+    background-color: #f3f3f3;
+    color: #333;
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #000;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+    .book-card {
+        padding: 30px 25px;
+    }
+
+    .book-card h1 {
+        font-size: 2.2rem;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .submit-btn,
+    .cancel-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
