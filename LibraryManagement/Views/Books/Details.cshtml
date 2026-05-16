@@ -1,7 +1,115 @@
-﻿<form method="post" action="/BorrowingTransactions/BorrowBook">
-    @Html.AntiForgeryToken()
-    <input type="hidden" name="bookId" value="@Model.Id" />
-    <button type="submit" class="btn btn-success">
-        Borrow This Book
-    </button>
-</form>
+﻿@model LibraryManagement.Models.Book
+
+@{
+    ViewData["Title"] = "Book Details";
+}
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/booksdetails.css"
+          asp-append-version="true" />
+}
+
+<div class="book-page">
+    <div class="book-card">
+
+        <p class="book-subtitle">LIBRARY MANAGEMENT SYSTEM</p>
+        <h1>Book Details</h1>
+        <p class="book-text">
+            View complete information about this book.
+        </p>
+
+        <div class="details-section">
+
+            @if (!string.IsNullOrEmpty(Model.CoverImagePath))
+            {
+                <div class="cover-preview">
+                    <img src="@Model.CoverImagePath"
+                         alt="@Model.Title"
+                         class="book-cover" />
+                </div>
+            }
+
+            <div class="detail-row">
+                <span class="detail-label">Book Title</span>
+                <span class="detail-value">@Model.Title</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Author</span>
+                <span class="detail-value">@Model.Author</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Genre</span>
+                <span class="detail-value">@Model.Genre</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">ISBN Number</span>
+                <span class="detail-value">@Model.ISBN</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Summary</span>
+                <span class="detail-value">
+                    @(string.IsNullOrEmpty(Model.Summary)
+                        ? "No summary available."
+                        : Model.Summary)
+                </span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Availability</span>
+                <span class="detail-value">
+                    @if (Model.IsAvailable)
+                    {
+                        <span class="status available">Available</span>
+                    }
+                    else
+                    {
+                        <span class="status unavailable">Not Available</span>
+                    }
+                </span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Library</span>
+                <span class="detail-value">
+                    @(Model.Library?.Name ?? "Main Library")
+                </span>
+            </div>
+
+        </div>
+
+        <!-- Borrow Button -->
+        @if (Model.IsAvailable)
+        {
+            <form method="post"
+                  action="/BorrowingTransactions/BorrowBook"
+                  class="borrow-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="bookId" value="@Model.Id" />
+
+                <button type="submit" class="borrow-btn">
+                    Borrow This Book
+                </button>
+            </form>
+        }
+
+        <!-- Navigation Buttons -->
+        <div class="button-group">
+            <a asp-action="Edit"
+               asp-route-id="@Model.Id"
+               class="edit-btn">
+                Edit Book
+            </a>
+
+            <a asp-action="Index"
+               class="cancel-btn">
+                Back to List
+            </a>
+        </div>
+
+    </div>
+</div>
