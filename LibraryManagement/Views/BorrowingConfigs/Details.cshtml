@@ -1,48 +1,85 @@
 ﻿@model LibraryManagement.Models.BorrowingConfig
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Borrowing Configuration Details";
 }
 
-<h1>Details</h1>
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/borrowingconfigdetails.css"
+          asp-append-version="true" />
+}
 
-<div>
-    <h4>BorrowingConfig</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LoanDurationDays)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LoanDurationDays)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.RenewalLimit)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.RenewalLimit)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OverduePenaltyPerDay)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OverduePenaltyPerDay)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MaxBorrowableItems)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MaxBorrowableItems)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Library)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Library.ContactDetails)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="config-page">
+    <div class="config-card">
+
+        <p class="config-subtitle">LIBRARY MANAGEMENT SYSTEM</p>
+        <h1>Borrowing Configuration Details</h1>
+        <p class="config-text">
+            View the borrowing rules set for this library.
+        </p>
+
+        <div class="details-section">
+
+            <div class="detail-row">
+                <span class="detail-label">Loan Duration (Days)</span>
+                <span class="detail-value">@Model.LoanDurationDays</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Renewal Limit</span>
+                <span class="detail-value">@Model.RenewalLimit</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Overdue Penalty Per Day</span>
+                <span class="detail-value">@Model.OverduePenaltyPerDay</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Maximum Borrowable Items</span>
+                <span class="detail-value">@Model.MaxBorrowableItems</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Library</span>
+                <span class="detail-value">
+                    @(Model.Library?.Name ?? "No Library Assigned")
+                </span>
+            </div>
+
+            @if (Model.Library != null)
+            {
+                <div class="detail-row">
+                    <span class="detail-label">Location</span>
+                    <span class="detail-value">@Model.Library.Location</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Operating Hours</span>
+                    <span class="detail-value">@Model.Library.OperatingHours</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Contact Details</span>
+                    <span class="detail-value">@Model.Library.ContactDetails</span>
+                </div>
+            }
+
+        </div>
+
+        <div class="button-group">
+            <a asp-action="Edit"
+               asp-route-id="@Model.Id"
+               class="edit-btn">
+                Edit Configuration
+            </a>
+
+            <a asp-action="Index"
+               class="cancel-btn">
+                Back to List
+            </a>
+        </div>
+
+    </div>
 </div>
