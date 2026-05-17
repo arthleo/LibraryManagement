@@ -1,48 +1,64 @@
 ﻿@model LibraryManagement.Models.Feedback
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Feedback Details";
 }
 
-<h1>Details</h1>
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/feedbackdetails.css"
+          asp-append-version="true" />
+}
 
-<div>
-    <h4>Feedback</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.User)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.User.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Book)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Book.Author)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Rating)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Rating)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Comment)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Comment)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SubmittedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SubmittedAt)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="details-page">
+    <div class="details-card">
+
+        <p class="details-subtitle">FEEDBACK MANAGEMENT</p>
+        <h1>Feedback Details</h1>
+        <p class="details-text">
+            View detailed information about the selected feedback.
+        </p>
+
+        <div class="details-box">
+            <div class="detail-row">
+                <span class="detail-label">User</span>
+                <span class="detail-value">@Model.User?.Email</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Book</span>
+                <span class="detail-value">@Model.Book?.Title</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Rating</span>
+                <span class="detail-value">⭐ @Model.Rating / 5</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Comment</span>
+                <span class="detail-value">@Model.Comment</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Submitted At</span>
+                <span class="detail-value">
+                    @Model.SubmittedAt.ToString("dd MMM yyyy")
+                </span>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <a asp-action="Edit"
+               asp-route-id="@Model.Id"
+               class="edit-btn">
+                Edit Feedback
+            </a>
+
+            <a asp-action="Index"
+               class="back-link">
+                Back to List
+            </a>
+        </div>
+    </div>
 </div>

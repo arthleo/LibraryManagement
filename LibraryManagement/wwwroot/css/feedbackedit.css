@@ -1,0 +1,142 @@
+/* Feedback Edit Page */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #e0f7fa, #f8fbff);
+}
+
+.edit-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+.edit-card {
+    width: 100%;
+    max-width: 750px;
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 45px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+}
+
+.edit-subtitle {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #3b82f6;
+    margin-bottom: 10px;
+}
+
+.edit-card h1 {
+    text-align: center;
+    font-size: 34px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #1e293b;
+}
+
+.edit-text {
+    text-align: center;
+    color: #64748b;
+    margin-bottom: 30px;
+    font-size: 15px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: 0.3s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.validation-summary {
+    color: #dc2626;
+    margin-bottom: 20px;
+}
+
+.text-danger {
+    color: #dc2626;
+    font-size: 14px;
+    margin-top: 5px;
+    display: block;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.save-btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.save-btn:hover {
+    background: #2563eb;
+}
+
+.back-link {
+    background: #e2e8f0;
+    color: #334155;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.back-link:hover {
+    background: #cbd5e1;
+    color: #1e293b;
+}
+
+@media (max-width: 768px) {
+    .edit-card {
+        padding: 30px 20px;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .save-btn,
+    .back-link {
+        width: 100%;
+        text-align: center;
+    }
+}
