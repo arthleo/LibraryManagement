@@ -1,94 +1,132 @@
 ﻿@model IEnumerable<LibraryManagement.Models.BorrowingTransaction>
+
 @{
-    ViewBag.Title = "All Transactions";
+    ViewData["Title"] = "All Borrowing Transactions";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>📋 All Borrowing Transactions</h2>
-        <div>
-            <a href="/BorrowingTransactions/OverdueBooks"
-               class="btn btn-danger">⚠️ Overdue Books</a>
-            <a href="/BorrowingTransactions/Report"
-               class="btn btn-info">📊 Report</a>
-        </div>
-    </div>
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/transactionindex.css"
+          asp-append-version="true" />
+}
 
-    <table class="table table-bordered table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Book</th>
-                <th>Member</th>
-                <th>Borrowed</th>
-                <th>Due Date</th>
-                <th>Returned</th>
-                <th>Status</th>
-                <th>Fine ($)</th>
-                <th>Fine Paid</th>
-                <th>Renewals</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model != null && Model.Any())
-            {
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>@item.Book?.Title</td>
-                        <td>@item.User?.Email</td>
-                        <td>@item.BorrowedAt.ToString("dd/MM/yyyy")</td>
-                        <td>
-                            @item.DueDate.ToString("dd/MM/yyyy")
-                            @if (item.DueDate < DateTime.Now
-                                                && item.Status == "Borrowed")
-                            {
-                                <span class="badge bg-danger">Overdue</span>
-                            }
-                        </td>
-                        <td>
-                            @(item.ReturnedAt.HasValue ?
-                                                item.ReturnedAt.Value.ToString("dd/MM/yyyy")
-                                                : "-")
-                        </td>
-                        <td>
-                            @if (item.Status == "Borrowed")
-                            {
-                                <span class="badge bg-primary">Borrowed</span>
-                            }
-                            else if (item.Status == "Returned")
-                            {
-                                <span class="badge bg-success">Returned</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-warning">
-                                    @item.Status
-                                </span>
-                            }
-                        </td>
-                        <td>$@item.FineAmount</td>
-                        <td>
-                            @if (item.FinePaid)
-                            {
-                                <span class="badge bg-success">Paid</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-danger">Unpaid</span>
-                            }
-                        </td>
-                        <td>@item.RenewalsUsed / 2</td>
-                    </tr>
-                }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="9" class="text-center">
-                        No transactions found.
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<div class="transactions-page">
+    <div class="transactions-card">
+
+        <p class="transactions-subtitle">LIBRARY MANAGEMENT SYSTEM</p>
+        <h1>All Borrowing Transactions</h1>
+        <p class="transactions-text">
+            View all borrowing records, due dates, fines, and payment status.
+        </p>
+
+        <!-- Top Buttons -->
+        <div class="button-group">
+            <a href="/BorrowingTransactions/OverdueBooks"
+               class="top-btn overdue-btn">
+                Overdue Books
+            </a>
+
+            <a href="/BorrowingTransactions/Report"
+               class="top-btn report-btn">
+                Report
+            </a>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Member</th>
+                            <th>Borrowed</th>
+                            <th>Due Date</th>
+                            <th>Returned</th>
+                            <th>Status</th>
+                            <th>Fine ($)</th>
+                            <th>Fine Paid</th>
+                            <th>Renewals</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Book?.Title</td>
+                                <td>@item.User?.Email</td>
+                                <td>@item.BorrowedAt.ToString("dd/MM/yyyy")</td>
+
+                                <td>
+                                    @item.DueDate.ToString("dd/MM/yyyy")
+
+                                    @if (item.DueDate < DateTime.Now &&
+                                         item.Status == "Borrowed")
+                                    {
+                                        <span class="status-badge overdue">
+                                            Overdue
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @(item.ReturnedAt.HasValue
+                                        ? item.ReturnedAt.Value.ToString("dd/MM/yyyy")
+                                        : "-")
+                                </td>
+
+                                <td>
+                                    @if (item.Status == "Borrowed")
+                                    {
+                                        <span class="status-badge borrowed">
+                                            Borrowed
+                                        </span>
+                                    }
+                                    else if (item.Status == "Returned")
+                                    {
+                                        <span class="status-badge returned">
+                                            Returned
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge pending">
+                                            @item.Status
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>$@item.FineAmount.ToString("0.00")</td>
+
+                                <td>
+                                    @if (item.FinePaid)
+                                    {
+                                        <span class="status-badge returned">
+                                            Paid
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge overdue">
+                                            Unpaid
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>@item.RenewalsUsed / 2</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="empty-message">
+                No borrowing transactions found.
+            </div>
+        }
+
+    </div>
 </div>
