@@ -1,74 +1,107 @@
 ﻿@model IEnumerable<LibraryManagement.Models.BorrowingTransaction>
+
 @{
-    ViewBag.Title = "Overdue Books";
+    ViewData["Title"] = "Overdue Books";
 }
 
-<div class="container mt-4">
-    <h2>⚠️ Overdue Books</h2>
-    <hr />
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/overduebooks.css"
+          asp-append-version="true" />
+}
 
-    <table class="table table-bordered table-hover">
-        <thead class="table-danger">
-            <tr>
-                <th>Book Title</th>
-                <th>Member</th>
-                <th>Due Date</th>
-                <th>Days Overdue</th>
-                <th>Fine ($)</th>
-                <th>Fine Paid</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model != null && Model.Any())
-            {
-                @foreach (var item in Model)
-                {
-                    int daysOverdue = (DateTime.Now - item.DueDate).Days;
-                    <tr class="table-danger">
-                        <td>@item.Book?.Title</td>
-                        <td>@item.User?.Email</td>
-                        <td>@item.DueDate.ToString("dd/MM/yyyy")</td>
-                        <td>@daysOverdue days</td>
-                        <td>$@item.FineAmount</td>
-                        <td>
-                            @if (item.FinePaid)
-                            {
-                                <span class="badge bg-success">Paid</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-danger">Unpaid</span>
-                            }
-                        </td>
-                        <td>
-                            @if (!item.FinePaid && item.FineAmount > 0)
-                            {
-                                <form method="post"
-                                      action="/BorrowingTransactions/MarkFinePaid/@item.Id"
-                                      style="display:inline">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit"
-                                            class="btn btn-sm btn-success">
-                                        Mark Fine Paid
-                                    </button>
-                                </form>
-                            }
-                        </td>
-                    </tr>
-                }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="7" class="text-center text-success">
-                        No overdue books! 🎉
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<div class="overdue-page">
+    <div class="overdue-card">
 
-    <a href="/BorrowingTransactions"
-       class="btn btn-secondary">Back to All Transactions</a>
+        <p class="overdue-subtitle">LIBRARY MANAGEMENT SYSTEM</p>
+        <h1>Overdue Books</h1>
+        <p class="overdue-text">
+            View all overdue books and manage outstanding fines.
+        </p>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="overdue-table">
+                    <thead>
+                        <tr>
+                            <th>Book Title</th>
+                            <th>Member</th>
+                            <th>Due Date</th>
+                            <th>Days Overdue</th>
+                            <th>Fine ($)</th>
+                            <th>Fine Paid</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            int daysOverdue = (DateTime.Now - item.DueDate).Days;
+
+                            <tr>
+                                <td>@item.Book?.Title</td>
+                                <td>@item.User?.Email</td>
+                                <td>@item.DueDate.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <span class="status-badge overdue">
+                                        @daysOverdue days
+                                    </span>
+                                </td>
+                                <td>$@item.FineAmount.ToString("0.00")</td>
+
+                                <td>
+                                    @if (item.FinePaid)
+                                    {
+                                        <span class="status-badge paid">
+                                            Paid
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge unpaid">
+                                            Unpaid
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (!item.FinePaid && item.FineAmount > 0)
+                                    {
+                                        <form method="post"
+                                              action="/BorrowingTransactions/MarkFinePaid/@item.Id">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit"
+                                                    class="action-btn paid-btn">
+                                                Mark Fine Paid
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="empty-message">
+                No overdue books found.
+            </div>
+        }
+
+        <div class="button-group">
+            <a href="/BorrowingTransactions"
+               class="back-btn">
+                Back to All Transactions
+            </a>
+        </div>
+
+    </div>
 </div>
