@@ -1,5 +1,34 @@
+@model IEnumerable<LibraryManagement.Models.Book>
+
 @{
     ViewData["Title"] = "Home Page";
+
+    // Books with uploaded images
+    var booksWithImages = Model?
+        .Where(b => !string.IsNullOrEmpty(b.CoverImagePath))
+        .ToList() ?? new List<LibraryManagement.Models.Book>();
+
+    // New Arrivals (latest 6 books)
+    var newArrivals = booksWithImages
+        .OrderByDescending(b => b.Id)
+        .Take(6)
+        .ToList();
+
+    // Most Borrowed Books (sample: first 4 books)
+    var mostBorrowed = booksWithImages
+        .Take(4)
+        .ToList();
+
+    // Recommended Books (sample: first 4 books)
+    var recommended = booksWithImages
+        .Take(4)
+        .ToList();
+
+    // Currently Available Books
+    var availableBooks = booksWithImages
+        .Where(b => b.IsAvailable)
+        .Take(6)
+        .ToList();
 }
 
 @section Styles {
@@ -15,7 +44,8 @@
         <p class="home-subtitle">LIBRARY MANAGEMENT SYSTEM</p>
         <h1>Welcome to Library Management System 📚</h1>
         <p class="home-text">
-            This system allows users to browse, manage, and borrow books online.
+            A user-friendly system for librarians and members to browse,
+            borrow, and manage books online.
         </p>
     </div>
 
@@ -63,17 +93,17 @@
         <div class="summary-container">
             <div class="summary-box">
                 <h3>Total Books</h3>
-                <p>6</p>
+                <p>@Model.Count()</p>
             </div>
 
             <div class="summary-box">
                 <h3>Available</h3>
-                <p>5</p>
+                <p>@Model.Count(b => b.IsAvailable)</p>
             </div>
 
             <div class="summary-box">
                 <h3>Borrowed</h3>
-                <p>1</p>
+                <p>@Model.Count(b => !b.IsAvailable)</p>
             </div>
         </div>
     </div>
@@ -81,83 +111,119 @@
     <!-- New Arrivals -->
     <div class="home-card">
         <h2>🆕 New Arrivals</h2>
+        <p class="section-description">
+            Recently added books in the library.
+        </p>
 
-        <div class="book-container">
-            <div class="book-card">
-                <img src="~/images/greatgatsby.jpg" asp-append-version="true" alt="The Great Gatsby" />
-                <h3>The Great Gatsby</h3>
-                <p>F. Scott Fitzgerald</p>
-            </div>
+        @if (newArrivals.Any())
+        {
+            <div class="book-container">
+                @foreach (var book in newArrivals)
+                {
+                    <div class="book-card">
+                        <img src="@book.CoverImagePath"
+                             alt="@book.Title" />
 
-            <div class="book-card">
-                <img src="~/images/harrypotter.jpg" asp-append-version="true" alt="Harry Potter" />
-                <h3>Harry Potter</h3>
-                <p>J.K. Rowling</p>
+                        <h3>@book.Title</h3>
+                        <p>@book.Author</p>
+                        <span class="book-tag">New</span>
+                    </div>
+                }
             </div>
-
-            <div class="book-card">
-                <img src="~/images/junglebook.jpg" asp-append-version="true" alt="The Jungle Book" />
-                <h3>The Jungle Book</h3>
-                <p>Rudyard Kipling</p>
-            </div>
-        </div>
+        }
+        else
+        {
+            <p class="empty-message">No new arrivals available.</p>
+        }
     </div>
 
     <!-- Most Borrowed Books -->
     <div class="home-card">
         <h2>🔥 Most Borrowed Books</h2>
+        <p class="section-description">
+            Popular books frequently borrowed by members.
+        </p>
 
-        <div class="book-container">
-            <div class="book-card">
-                <img src="~/images/harrypotter.jpg" asp-append-version="true" alt="Harry Potter" />
-                <h3>Harry Potter</h3>
-                <p>Borrowed 25 times</p>
-            </div>
+        @if (mostBorrowed.Any())
+        {
+            <div class="book-container">
+                @foreach (var book in mostBorrowed)
+                {
+                    <div class="book-card">
+                        <img src="@book.CoverImagePath"
+                             alt="@book.Title" />
 
-            <div class="book-card">
-                <img src="~/images/greatgatsby.jpg" asp-append-version="true" alt="The Great Gatsby" />
-                <h3>The Great Gatsby</h3>
-                <p>Borrowed 18 times</p>
+                        <h3>@book.Title</h3>
+                        <p>@book.Author</p>
+                        <span class="book-tag popular">Popular</span>
+                    </div>
+                }
             </div>
-        </div>
+        }
+        else
+        {
+            <p class="empty-message">No borrowing data available.</p>
+        }
     </div>
 
     <!-- Recommended Books -->
     <div class="home-card">
         <h2>⭐ Recommended Books</h2>
+        <p class="section-description">
+            Books recommended for readers.
+        </p>
 
-        <div class="book-container">
-            <div class="book-card">
-                <img src="~/images/junglebook.jpg" asp-append-version="true" alt="The Jungle Book" />
-                <h3>The Jungle Book</h3>
-                <p>Highly rated by readers</p>
-            </div>
+        @if (recommended.Any())
+        {
+            <div class="book-container">
+                @foreach (var book in recommended)
+                {
+                    <div class="book-card">
+                        <img src="@book.CoverImagePath"
+                             alt="@book.Title" />
 
-            <div class="book-card">
-                <img src="~/images/greatgatsby.jpg" asp-append-version="true" alt="The Great Gatsby" />
-                <h3>The Great Gatsby</h3>
-                <p>Recommended classic novel</p>
+                        <h3>@book.Title</h3>
+                        <p>@book.Author</p>
+                        <span class="book-tag recommended">Recommended</span>
+                    </div>
+                }
             </div>
-        </div>
+        }
+        else
+        {
+            <p class="empty-message">No recommendations available.</p>
+        }
     </div>
 
     <!-- Currently Available Books -->
     <div class="home-card">
         <h2>✅ Currently Available Books</h2>
+        <p class="section-description">
+            Books that are available for borrowing right now.
+        </p>
 
-        <div class="book-container">
-            <div class="book-card">
-                <img src="~/images/harrypotter.jpg" asp-append-version="true" alt="Harry Potter" />
-                <h3>Harry Potter</h3>
-                <p>Available Now</p>
-            </div>
+        @if (availableBooks.Any())
+        {
+            <div class="book-container">
+                @foreach (var book in availableBooks)
+                {
+                    <div class="book-card">
+                        <img src="@book.CoverImagePath"
+                             alt="@book.Title" />
 
-            <div class="book-card">
-                <img src="~/images/junglebook.jpg" asp-append-version="true" alt="The Jungle Book" />
-                <h3>The Jungle Book</h3>
-                <p>Available Now</p>
+                        <h3>@book.Title</h3>
+                        <p>@book.Author</p>
+                        <span class="book-tag available">Available</span>
+                    </div>
+                }
             </div>
-        </div>
+        }
+        else
+        {
+            <p class="empty-message">
+                No books are currently available.
+            </p>
+        }
     </div>
 
     <!-- Footer -->
