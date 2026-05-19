@@ -1,0 +1,193 @@
+/* =========================================================
+   DELETE PAGE UI CSS
+   Same design as your Library List page
+   Orange + Black + White theme
+========================================================= */
+
+/* Page Background */
+body {
+    background-color: #f5f1e8;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Page Layout */
+.delete-page {
+    min-height: 100vh;
+    padding: 60px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* Main Card */
+.delete-card {
+    width: 100%;
+    max-width: 900px;
+    background: #ffffff;
+    border: 3px solid #000;
+    border-radius: 12px;
+    box-shadow: 8px 8px 0 #000;
+    padding: 50px;
+}
+
+/* Subtitle */
+.delete-subtitle {
+    color: #ed7d3a;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+/* Main Heading */
+.delete-card h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #111;
+    margin-bottom: 12px;
+}
+
+/* Description Text */
+.delete-text {
+    color: #666;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 35px;
+}
+
+/* Warning Text */
+.warning-text {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+/* Details Box */
+.details-box {
+    background: #faf7f2;
+    border: 3px solid #000;
+    border-radius: 12px;
+    box-shadow: 4px 4px 0 #000;
+    padding: 25px;
+    margin-bottom: 35px;
+}
+
+/* Detail Row */
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 14px 0;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+/* Label */
+.detail-label {
+    font-weight: 700;
+    color: #ed7d3a;
+    min-width: 180px;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+/* Value */
+.detail-value {
+    color: #111;
+    font-weight: 600;
+    text-align: right;
+    word-break: break-word;
+    flex: 1;
+}
+
+/* Button Group */
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+/* Delete Button */
+.delete-btn {
+    display: inline-block;
+    padding: 14px 30px;
+    background-color: #dc2626;
+    color: #fff;
+    border: 3px solid #000;
+    border-radius: 12px;
+    box-shadow: 4px 4px 0 #000;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+/* Delete Button Hover */
+.delete-btn:hover {
+    background-color: #b91c1c;
+    color: #fff;
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #000;
+}
+
+/* Back Button */
+.back-link {
+    display: inline-block;
+    padding: 14px 30px;
+    background-color: #f8f5f0;
+    color: #111;
+    text-decoration: none;
+    border: 3px solid #000;
+    border-radius: 12px;
+    box-shadow: 4px 4px 0 #000;
+    font-weight: 700;
+    font-size: 15px;
+    transition: all 0.2s ease;
+}
+
+/* Back Button Hover */
+.back-link:hover {
+    background-color: #ece7de;
+    color: #111;
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #000;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .delete-card {
+        padding: 30px 20px;
+    }
+
+    .delete-card h1 {
+        font-size: 2.2rem;
+    }
+
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .detail-value {
+        text-align: left;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .delete-btn,
+    .back-link {
+        width: 100%;
+        text-align: center;
+    }
+}

@@ -1,45 +1,59 @@
 ﻿@model LibraryManagement.Models.Library
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Delete Library";
 }
 
-<h1>Delete</h1>
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/librarydelete.css"
+          asp-append-version="true" />
+}
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Library</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Location)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Location)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OperatingHours)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OperatingHours)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ContactDetails)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ContactDetails)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+<div class="delete-page">
+    <div class="delete-card">
+
+        <p class="delete-subtitle">LIBRARY MANAGEMENT</p>
+        <h1>Delete Library</h1>
+        <p class="delete-text">
+            Are you sure you want to delete this library? This action cannot be undone.
+        </p>
+
+        <div class="details-box">
+            <div class="detail-row">
+                <span class="detail-label">Library Name</span>
+                <span class="detail-value">@Model.Name</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Location</span>
+                <span class="detail-value">@Model.Location</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Operating Hours</span>
+                <span class="detail-value">@Model.OperatingHours</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Contact Details</span>
+                <span class="detail-value">@Model.ContactDetails</span>
+            </div>
+        </div>
+
+        <form asp-action="Delete" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+
+            <div class="button-group">
+                <button type="submit" class="delete-btn">
+                    Delete Library
+                </button>
+
+                <a asp-action="Index" class="back-link">
+                    Back to List
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
