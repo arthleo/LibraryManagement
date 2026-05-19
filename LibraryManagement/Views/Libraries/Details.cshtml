@@ -1,42 +1,177 @@
 ﻿@model LibraryManagement.Models.Library
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Library Details";
 }
 
-<h1>Details</h1>
+<style>
+    .details-page {
+        min-height: 100vh;
+        background: #f5f0e8;
+        padding: 40px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-<div>
-    <h4>Library</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Location)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Location)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OperatingHours)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OperatingHours)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ContactDetails)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ContactDetails)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    .details-card {
+        width: 100%;
+        max-width: 700px;
+        background: white;
+        border: 2px solid #111;
+        box-shadow: 8px 8px 0 #111;
+        padding: 35px;
+    }
+
+    .details-title {
+        font-size: 2rem;
+        font-weight: 900;
+        color: #111;
+        margin-bottom: 10px;
+    }
+
+    .details-subtitle {
+        color: #666;
+        margin-bottom: 30px;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .details-label {
+        font-weight: 800;
+        color: #111;
+        font-size: 1rem;
+    }
+
+    .details-value {
+        background: #fafafa;
+        border: 2px solid #111;
+        padding: 12px;
+        border-radius: 10px;
+        box-shadow: 3px 3px 0 #111;
+    }
+
+    .button-group {
+        margin-top: 30px;
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .btn-edit {
+        background: #c0392b;
+        color: white;
+        text-decoration: none;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-weight: 700;
+        box-shadow: 3px 3px 0 #111;
+        transition: 0.2s ease;
+    }
+
+        .btn-edit:hover {
+            background: #a93226;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+    .btn-back {
+        background: #111;
+        color: white;
+        text-decoration: none;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-weight: 700;
+        box-shadow: 3px 3px 0 #111;
+        transition: 0.2s ease;
+    }
+
+        .btn-back:hover {
+            background: #333;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+    @@media (max-width: 700px) {
+
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .details-label {
+            margin-top: 10px;
+        }
+    }
+</style>
+
+<div class="details-page">
+
+    <div class="details-card">
+
+        <h1 class="details-title">
+            Library Details
+        </h1>
+
+        <p class="details-subtitle">
+            View detailed information about this library.
+        </p>
+
+        <div class="details-grid">
+
+            <div class="details-label">
+                Name
+            </div>
+
+            <div class="details-value">
+                @Html.DisplayFor(model => model.Name)
+            </div>
+
+            <div class="details-label">
+                Location
+            </div>
+
+            <div class="details-value">
+                @Html.DisplayFor(model => model.Location)
+            </div>
+
+            <div class="details-label">
+                Operating Hours
+            </div>
+
+            <div class="details-value">
+                @Html.DisplayFor(model => model.OperatingHours)
+            </div>
+
+            <div class="details-label">
+                Contact Details
+            </div>
+
+            <div class="details-value">
+                @Html.DisplayFor(model => model.ContactDetails)
+            </div>
+
+        </div>
+
+        <div class="button-group">
+
+            <a asp-action="Edit"
+               asp-route-id="@Model?.Id"
+               class="btn-edit">
+                Edit Library
+            </a>
+
+            <a asp-action="Index"
+               class="btn-back">
+                Back to List
+            </a>
+
+        </div>
+
+    </div>
+
 </div>
