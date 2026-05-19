@@ -1,66 +1,83 @@
 @model LibraryManagement.Models.Reservation
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Reservation Details";
 }
 
-<h1>Details</h1>
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/reservation-details.css"
+          asp-append-version="true" />
+}
 
-<div>
-    <h4>Reservation</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UserId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UserId)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.User)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.User)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BookId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BookId)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Book)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Book)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ReservedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ReservedAt)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ExpiryDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ExpiryDate)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="details-page">
+    <div class="details-card">
+
+        <p class="page-subtitle">RESERVATION MANAGEMENT</p>
+        <h1>Reservation Details</h1>
+        <p class="page-description">
+            View complete information about this reservation.
+        </p>
+
+        <div class="details-grid">
+
+            <div class="detail-item">
+                <span class="detail-label">User ID</span>
+                <span class="detail-value">@Model.UserId</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">User</span>
+                <span class="detail-value">
+                    @(Model.User?.Email ?? "N/A")
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Book ID</span>
+                <span class="detail-value">@Model.BookId</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Book</span>
+                <span class="detail-value">
+                    @(Model.Book?.Title ?? "N/A")
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Reserved At</span>
+                <span class="detail-value">
+                    @Model.ReservedAt.ToString("dd MMM yyyy hh:mm tt")
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Expiry Date</span>
+                <span class="detail-value">
+                    @Model.ExpiryDate.ToString("dd MMM yyyy hh:mm tt")
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Status</span>
+                <span class="detail-value">@Model.Status</span>
+            </div>
+
+        </div>
+
+        <div class="button-group">
+            <a asp-action="Edit"
+               asp-route-id="@Model.Id"
+               class="submit-btn">
+                Edit Reservation
+            </a>
+
+            <a asp-action="Index"
+               class="back-link">
+                Back to List
+            </a>
+        </div>
+
+    </div>
 </div>
