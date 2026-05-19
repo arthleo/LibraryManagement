@@ -1,66 +1,93 @@
 @model LibraryManagement.Models.Reservation
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Reservation";
 }
 
-<h1>Create</h1>
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/reservation-create.css"
+          asp-append-version="true" />
+}
 
-<h4>Reservation</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+<div class="form-page">
+    <div class="form-card">
+
+        <p class="page-subtitle">RESERVATION MANAGEMENT</p>
+        <h1>Create Reservation</h1>
+        <p class="page-description">
+            Add a new reservation for a library member.
+        </p>
+
         <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger validation-summary"></div>
 
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
+            <div class="mb-4">
+                <label asp-for="UserId" class="form-label"></label>
                 <input asp-for="UserId" class="form-control" />
-                <span asp-validation-for="UserId" class="text-danger"></span>
+                <span asp-validation-for="UserId"
+                      class="text-danger small"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="User" class="control-label"></label>
+            <div class="mb-4">
+                <label asp-for="User" class="form-label"></label>
                 <input asp-for="User" class="form-control" />
-                <span asp-validation-for="User" class="text-danger"></span>
+                <span asp-validation-for="User"
+                      class="text-danger small"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="BookId" class="control-label"></label>
+            <div class="mb-4">
+                <label asp-for="BookId" class="form-label"></label>
                 <input asp-for="BookId" class="form-control" />
-                <span asp-validation-for="BookId" class="text-danger"></span>
+                <span asp-validation-for="BookId"
+                      class="text-danger small"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="Book" class="control-label"></label>
+            <div class="mb-4">
+                <label asp-for="Book" class="form-label"></label>
                 <input asp-for="Book" class="form-control" />
-                <span asp-validation-for="Book" class="text-danger"></span>
+                <span asp-validation-for="Book"
+                      class="text-danger small"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="ReservedAt" class="control-label"></label>
+            <div class="mb-4">
+                <label asp-for="ReservedAt" class="form-label"></label>
                 <input asp-for="ReservedAt" class="form-control" />
-                <span asp-validation-for="ReservedAt" class="text-danger"></span>
+                <span asp-validation-for="ReservedAt"
+                      class="text-danger small"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="ExpiryDate" class="control-label"></label>
+            <div class="mb-4">
+                <label asp-for="ExpiryDate" class="form-label"></label>
                 <input asp-for="ExpiryDate" class="form-control" />
-                <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+                <span asp-validation-for="ExpiryDate"
+                      class="text-danger small"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
+            <div class="mb-4">
+                <label asp-for="Status" class="form-label"></label>
                 <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
+                <span asp-validation-for="Status"
+                      class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+
+            <div class="button-group">
+                <button type="submit" class="submit-btn">
+                    Create Reservation
+                </button>
+
+                <a asp-action="Index" class="back-link">
+                    Back to List
+                </a>
             </div>
         </form>
+
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
