@@ -9,232 +9,293 @@
 }
 
 <style>
+    body {
+        background-color: #f5f1e8;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
     .dash {
-        padding: 2rem 1.5rem;
-        background: #f5f0e8;
-        min-height: calc(100vh - 64px);
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        min-height: 100vh;
+        padding: 60px 20px;
     }
 
     .page-heading {
-        font-size: 1.6rem;
-        font-weight: 900;
-        letter-spacing: -0.03em;
+        font-size: 3rem;
+        font-weight: 800;
         color: #111;
-        margin: 0 0 0.25rem;
+        margin-bottom: 10px;
     }
 
     .page-sub {
-        font-size: 0.82rem;
         color: #666;
-        margin: 0 0 1.5rem;
+        font-size: 1.05rem;
+        margin-bottom: 30px;
     }
 
     .back-link {
-        font-size: 0.72rem;
+        display: inline-block;
+        margin-bottom: 25px;
+        color: #ed7d3a;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: #c0392b;
+        letter-spacing: 1px;
         text-decoration: none;
-        border-bottom: 1.5px solid #c0392b;
-        display: inline-block;
-        margin-bottom: 1.5rem;
     }
 
+    .back-link:hover {
+        color: #d96d2e;
+    }
+
+    /* Search Bar */
     .search-bar {
         display: flex;
-        gap: 0.75rem;
-        margin-bottom: 1rem;
+        gap: 15px;
         flex-wrap: wrap;
+        margin-bottom: 20px;
     }
 
     .search-input {
         flex: 1;
-        min-width: 200px;
-        padding: 0.75rem;
-        font-size: 0.9rem;
-        border: 1.5px solid #000;
-        border-radius: 0.5rem;
-        box-shadow: 2.5px 3px 0 #000;
+        min-width: 250px;
+        padding: 14px 18px;
+        border: 3px solid #000;
+        border-radius: 12px;
+        box-shadow: 4px 4px 0 #000;
+        font-size: 15px;
         outline: none;
-        font-family: inherit;
+    }
+
+    .search-btn,
+    .clear-btn {
+        padding: 14px 24px;
+        border: 3px solid #000;
+        border-radius: 12px;
+        box-shadow: 4px 4px 0 #000;
+        font-weight: 700;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: all 0.2s ease;
     }
 
     .search-btn {
-        padding: 0.75rem 1.25rem;
-        background: #c0392b;
-        color: #fff;
-        font-size: 0.8rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        border: 1.5px solid #000;
-        border-radius: 0.5rem;
-        box-shadow: 2.5px 3px 0 #000;
+        background-color: #ed7d3a;
+        color: white;
         cursor: pointer;
     }
 
     .clear-btn {
-        padding: 0.75rem 1rem;
-        background: #fff;
+        background: white;
         color: #111;
-        font-size: 0.8rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        border: 1.5px solid #000;
-        border-radius: 0.5rem;
-        box-shadow: 2.5px 3px 0 #000;
-        text-decoration: none;
         display: inline-flex;
         align-items: center;
     }
 
-    .genre-bar {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-        margin-bottom: 1.5rem;
-    }
-
-    .genre-btn {
-        font-size: 0.7rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        padding: 0.3rem 0.7rem;
-        border: 1.5px solid #000;
-        background: #fff;
-        cursor: pointer;
-        text-decoration: none;
-        color: #111;
+    .search-btn:hover,
+    .clear-btn:hover {
+        transform: translate(2px, 2px);
         box-shadow: 2px 2px 0 #000;
     }
 
-        .genre-btn.active {
-            background: #111;
-            color: #fff;
-        }
-
-        .genre-btn.active-red {
-            background: #c0392b;
-            color: #fff;
-        }
-
-    .book-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-        gap: 1rem;
+    /* Genre Buttons */
+    .genre-bar {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
     }
 
+    .genre-btn {
+        padding: 8px 16px;
+        border: 3px solid #000;
+        border-radius: 10px;
+        background: white;
+        color: #111;
+        text-decoration: none;
+        font-weight: 700;
+        box-shadow: 3px 3px 0 #000;
+        transition: all 0.2s ease;
+    }
+
+    .genre-btn:hover {
+        transform: translate(2px, 2px);
+        box-shadow: 1px 1px 0 #000;
+    }
+
+    .genre-btn.active {
+        background: #111;
+        color: white;
+    }
+
+    .genre-btn.active-red {
+        background: #ed7d3a;
+        color: white;
+    }
+
+    .results-count {
+        color: #666;
+        font-weight: 600;
+        margin-bottom: 25px;
+    }
+
+    /* Book Grid */
+    .book-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 25px;
+    }
+
+    /* Book Card */
     .book-card {
         background: #fff;
-        border: 2px solid #000;
-        box-shadow: 3px 3px 0 #000;
-        padding: 1rem;
+        border: 3px solid #000;
+        border-radius: 16px;
+        box-shadow: 6px 6px 0 #000;
+        padding: 20px;
         display: flex;
         flex-direction: column;
-        gap: 0.4rem;
+        transition: all 0.2s ease;
+    }
+
+    .book-card:hover {
+        transform: translate(3px, 3px);
+        box-shadow: 3px 3px 0 #000;
     }
 
     .book-card--unavailable {
         opacity: 0.85;
     }
 
+    /* Book Cover Image */
+    .book-card__image-wrap {
+        width: 100%;
+        height: 300px;
+        border: 3px solid #000;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #f8f8f8;
+        margin-bottom: 18px;
+    }
+
+    .book-card__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    /* Book Info */
     .book-card__genre {
-        font-size: 0.62rem;
+        font-size: 0.75rem;
         font-weight: 700;
+        color: #ed7d3a;
         text-transform: uppercase;
-        color: #c0392b;
-        margin: 0;
+        letter-spacing: 1px;
+        margin-bottom: 6px;
     }
 
     .book-card__title {
-        font-size: 0.9rem;
-        font-weight: 700;
+        font-size: 1.2rem;
+        font-weight: 800;
         color: #111;
-        margin: 0;
+        margin-bottom: 6px;
     }
 
     .book-card__author {
-        font-size: 0.78rem;
         color: #666;
-        margin: 0;
+        margin-bottom: 8px;
     }
 
-    .book-card__isbn {
-        font-size: 0.68rem;
-        color: #aaa;
-        margin: 0;
-    }
-
+    .book-card__isbn,
     .book-card__lib {
-        font-size: 0.72rem;
-        color: #999;
-        margin: 0;
+        font-size: 0.85rem;
+        color: #777;
+        margin-bottom: 6px;
     }
 
-    .book-card__actions {
-        margin-top: auto;
-        padding-top: 0.5rem;
-    }
-
+    /* Status Badge */
     .badge {
         display: inline-block;
-        font-size: 0.63rem;
+        padding: 6px 12px;
+        border: 2px solid #000;
+        border-radius: 20px;
+        font-size: 0.75rem;
         font-weight: 700;
-        text-transform: uppercase;
-        padding: 0.18rem 0.45rem;
-        border: 1.5px solid #000;
+        margin-bottom: 15px;
+        width: fit-content;
     }
 
     .badge--green {
         background: #27ae60;
-        color: #fff;
+        color: white;
     }
 
     .badge--gray {
-        background: #ccc;
-        color: #555;
+        background: #d1d5db;
+        color: #333;
     }
 
+    /* Action Buttons */
     .btn {
         display: block;
         width: 100%;
-        padding: 0.45rem;
-        font-size: 0.75rem;
+        padding: 12px;
+        border: 3px solid #000;
+        border-radius: 10px;
+        box-shadow: 3px 3px 0 #000;
         font-weight: 700;
         text-transform: uppercase;
-        border: 1.5px solid #000;
-        box-shadow: 2px 2px 0 #000;
-        background: #fff;
-        color: #111;
         text-align: center;
-        font-family: inherit;
+        transition: all 0.2s ease;
         cursor: pointer;
     }
 
+    .btn:hover {
+        transform: translate(2px, 2px);
+        box-shadow: 1px 1px 0 #000;
+    }
+
     .btn--red {
-        background: #c0392b;
-        color: #fff;
+        background: #ed7d3a;
+        color: white;
     }
 
     .btn--black {
         background: #111;
-        color: #fff;
+        color: white;
     }
 
+    /* No Results */
     .no-results {
+        background: white;
+        border: 3px solid #000;
+        border-radius: 16px;
+        box-shadow: 6px 6px 0 #000;
+        padding: 40px;
         text-align: center;
-        padding: 3rem;
-        background: #fff;
-        border: 2px solid #000;
-        box-shadow: 4px 4px 0 #000;
         color: #666;
+        font-weight: 600;
     }
 
-    .results-count {
-        font-size: 0.78rem;
-        color: #666;
-        margin: 0 0 1rem;
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .page-heading {
+            font-size: 2.2rem;
+        }
+
+        .search-bar {
+            flex-direction: column;
+        }
+
+        .search-btn,
+        .clear-btn {
+            width: 100%;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .book-card__image-wrap {
+            height: 250px;
+        }
     }
 </style>
 
@@ -242,63 +303,55 @@
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">
+        <div class="alert alert-success mb-4">
             @TempData["Success"]
         </div>
     }
 
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger">
+        <div class="alert alert-danger mb-4">
             @TempData["Error"]
         </div>
     }
 
-    <a href="/Member"
-       class="back-link">
-        ← Back to Dashboard
-    </a>
+    <a href="/Member" class="back-link">← Back to Dashboard</a>
 
     <h1 class="page-heading">Browse Books</h1>
-
     <p class="page-sub">
         Find your next read from the library collection.
     </p>
 
+    <!-- Search Form -->
     <form method="get" action="/Member/Browse">
-
         <div class="search-bar">
 
             <input type="text"
                    name="search"
                    class="search-input"
-                   placeholder="Search by title or author..."
+                   placeholder="Search by title, author, or genre..."
                    value="@search" />
 
             <input type="hidden"
                    name="genre"
                    value="@genre" />
 
-            <button type="submit"
-                    class="search-btn">
+            <button type="submit" class="search-btn">
                 Search
             </button>
 
-            @if (!string.IsNullOrEmpty(search) ||
-                        !string.IsNullOrEmpty(genre))
+            @if (!string.IsNullOrEmpty(search) || !string.IsNullOrEmpty(genre))
             {
-                <a href="/Member/Browse"
-                   class="clear-btn">
-                    ✕ Clear
+                <a href="/Member/Browse" class="clear-btn">
+                    Clear
                 </a>
             }
 
         </div>
-
     </form>
 
+    <!-- Genre Filters -->
     <div class="genre-bar">
-
         <a href="/Member/Browse"
            class="genre-btn @(string.IsNullOrEmpty(genre) ? "active" : "")">
             All
@@ -311,7 +364,6 @@
                 @g
             </a>
         }
-
     </div>
 
     <p class="results-count">
@@ -321,7 +373,7 @@
     @if (!Model.Any())
     {
         <div class="no-results">
-            <p>No books found.</p>
+            No books found.
         </div>
     }
     else
@@ -332,52 +384,55 @@
             {
                 <div class="book-card @(!b.IsAvailable ? "book-card--unavailable" : "")">
 
+                    <!-- Book Cover Image -->
+                    <div class="book-card__image-wrap">
+                        @if (!string.IsNullOrEmpty(b.CoverImagePath))
+                        {
+                            <img src="@b.CoverImagePath"
+                                 alt="@b.Title"
+                                 class="book-card__image"
+                                 onerror="this.onerror=null; this.src='/images/no-book-cover.png';" />
+                        }
+                        else
+                        {
+                            <img src="/images/no-book-cover.png"
+                                 alt="No Cover"
+                                 class="book-card__image" />
+                        }
+                    </div>
+
                     <p class="book-card__genre">@b.Genre</p>
-
-                    <p class="book-card__title">@b.Title</p>
-
-                    <p class="book-card__author">@b.Author</p>
-
-                    <p class="book-card__isbn">
-                        ISBN @b.ISBN
-                    </p>
-
+                    <h3 class="book-card__title">@b.Title</h3>
+                    <p class="book-card__author">by @b.Author</p>
+                    <p class="book-card__isbn">ISBN: @b.ISBN</p>
                     <p class="book-card__lib">
-                        📍 @(b.Library?.Name ?? "—")
+                        📍 @(b.Library?.Name ?? "Unknown Library")
                     </p>
 
                     @if (b.IsAvailable)
                     {
-                        <span class="badge badge--green">
-                            Available
-                        </span>
+                        <span class="badge badge--green">Available</span>
                     }
                     else
                     {
-                        <span class="badge badge--gray">
-                            Borrowed
-                        </span>
+                        <span class="badge badge--gray">Borrowed</span>
                     }
 
                     <div class="book-card__actions">
-
                         @if (b.IsAvailable)
                         {
                             <form asp-controller="Member"
                                   asp-action="Borrow"
                                   method="post">
-
                                 @Html.AntiForgeryToken()
-
                                 <input type="hidden"
                                        name="bookId"
                                        value="@b.Id" />
 
                                 <button type="submit"
                                         class="btn btn--red">
-                                    Borrow →
+                                    Borrow
                                 </button>
-
                             </form>
                         }
                         else
@@ -385,9 +440,7 @@
                             <form asp-controller="Member"
                                   asp-action="Reserve"
                                   method="post">
-
                                 @Html.AntiForgeryToken()
-
                                 <input type="hidden"
                                        name="bookId"
                                        value="@b.Id" />
@@ -396,10 +449,8 @@
                                         class="btn btn--black">
                                     Reserve
                                 </button>
-
                             </form>
                         }
-
                     </div>
 
                 </div>
@@ -407,5 +458,4 @@
 
         </div>
     }
-
 </div>
