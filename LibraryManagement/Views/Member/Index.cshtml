@@ -21,200 +21,209 @@
         as IEnumerable<LibraryManagement.Models.Reservation>
         ?? [];
 
-    decimal unpaidFines =
-        ViewBag.UnpaidFines ?? 0m;
-
-    int overdueCount =
-        ViewBag.OverdueCount ?? 0;
+    decimal unpaidFines = ViewBag.UnpaidFines ?? 0m;
+    int overdueCount = ViewBag.OverdueCount ?? 0;
 }
 
 <style>
+    body {
+        background-color: #f5f1e8;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
     .dash {
-        padding: 2rem 1.5rem;
-        background: #f5f0e8;
-        min-height: calc(100vh - 64px);
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        min-height: 100vh;
+        padding: 60px 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .dashboard-card {
+        width: 100%;
+        max-width: 1400px;
+        background: #ffffff;
+        border: 3px solid #000;
+        border-radius: 12px;
+        box-shadow: 8px 8px 0 #000;
+        padding: 50px;
+    }
+
+    /* Header */
+    .page-subtitle {
+        color: #ed7d3a;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
     }
 
     .page-heading {
-        font-size: 1.6rem;
-        font-weight: 900;
+        font-size: 3rem;
+        font-weight: 800;
         color: #111;
-        margin-bottom: 1.5rem;
+        margin-bottom: 10px;
     }
 
+    .page-description {
+        color: #666;
+        font-size: 1.05rem;
+        line-height: 1.7;
+        margin-bottom: 30px;
+    }
+
+    /* Alerts */
     .alert {
-        padding: 1rem;
-        margin-bottom: 1rem;
-        border: 2px solid #000;
-        box-shadow: 3px 3px 0 #000;
-        font-weight: 700;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        border: 3px solid #000;
+        border-radius: 12px;
+        box-shadow: 4px 4px 0 #000;
+        font-weight: 600;
     }
 
     .alert--green {
-        background: #e8fff0;
-        color: #1b7d3c;
+        background: #e8f7ed;
+        color: #1f7a3d;
     }
 
     .alert--red {
-        background: #fff1f1;
-        color: #c0392b;
+        background: #fdeaea;
+        color: #c63c2c;
     }
 
+    /* Stats */
     .stat-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+        margin-bottom: 50px;
     }
 
     .stat-card {
-        background: #fff;
-        border: 2px solid #000;
+        background: #faf7f2;
+        border: 3px solid #000;
+        border-radius: 12px;
         box-shadow: 4px 4px 0 #000;
-        padding: 1rem;
+        padding: 25px;
+        text-align: center;
     }
 
     .stat-card__label {
-        font-size: 0.75rem;
+        font-size: 0.85rem;
+        font-weight: 700;
         text-transform: uppercase;
         color: #666;
-        font-weight: 700;
+        margin-bottom: 8px;
     }
 
     .stat-card__value {
-        font-size: 1.8rem;
-        font-weight: 900;
-        margin-top: 0.4rem;
+        font-size: 2rem;
+        font-weight: 800;
+        color: #ed7d3a;
     }
 
+    /* Sections */
     .section {
-        margin-bottom: 2rem;
+        margin-bottom: 60px;
     }
 
     .section__header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 20px;
     }
 
     .section__title {
-        font-size: 0.8rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        color: #333;
-    }
-
-    .book-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-        gap: 1rem;
-    }
-
-    .book-card {
-        background: #fff;
-        border: 2px solid #000;
-        box-shadow: 3px 3px 0 #000;
-        padding: 1rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .book-card__genre {
-        font-size: 0.65rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: #c0392b;
-    }
-
-    .book-card__title {
-        font-size: 0.95rem;
+        font-size: 1.8rem;
         font-weight: 800;
         color: #111;
+        margin: 0;
     }
 
-    .book-card__author {
-        font-size: 0.8rem;
-        color: #666;
-    }
-
-    .book-card__library {
-        font-size: 0.72rem;
-        color: #999;
-    }
-
-    .book-card__actions {
-        margin-top: auto;
-    }
-
+    /* Buttons */
     .btn {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1.5px solid #000;
-        box-shadow: 2px 2px 0 #000;
-        font-size: 0.75rem;
+        display: inline-block;
+        padding: 10px 20px;
+        border: 3px solid #000;
+        border-radius: 12px;
+        box-shadow: 4px 4px 0 #000;
         font-weight: 700;
         text-transform: uppercase;
+        font-size: 0.8rem;
+        text-decoration: none;
         cursor: pointer;
-        text-align: center;
-        display: inline-block;
+        transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+        transform: translate(2px, 2px);
+        box-shadow: 2px 2px 0 #000;
     }
 
     .btn--red {
-        background: #c0392b;
-        color: white;
+        background: #ed7d3a;
+        color: #fff;
     }
 
     .btn--black {
         background: #111;
-        color: white;
+        color: #fff;
     }
 
     .btn--yellow {
-        background: #f1c40f;
+        background: #f4c542;
         color: #111;
     }
 
+    /* Loan Cards */
     .loan-list {
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: 20px;
     }
 
     .loan-card {
-        background: #fff;
-        border: 2px solid #000;
-        box-shadow: 3px 3px 0 #000;
-        padding: 1rem;
+        background: #faf7f2;
+        border: 3px solid #000;
+        border-radius: 12px;
+        box-shadow: 4px 4px 0 #000;
+        padding: 25px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 1rem;
+        gap: 20px;
+        flex-wrap: wrap;
     }
 
     .loan-card__title {
-        font-weight: 800;
+        font-size: 1.2rem;
+        font-weight: 700;
         color: #111;
     }
 
     .loan-card__author {
-        font-size: 0.8rem;
         color: #666;
+        margin-top: 5px;
     }
 
     .loan-card__due {
-        font-size: 0.75rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #c63c2c;
     }
 
+    /* Tables */
     .table-box {
+        overflow-x: auto;
         background: #fff;
-        border: 2px solid #000;
-        box-shadow: 3px 3px 0 #000;
-        overflow: hidden;
+        border: 3px solid #000;
+        border-radius: 12px;
+        box-shadow: 4px 4px 0 #000;
     }
 
     table {
@@ -222,263 +231,397 @@
         border-collapse: collapse;
     }
 
-    th {
+    thead {
         background: #111;
         color: #fff;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        padding: 0.8rem;
     }
 
+    th,
     td {
-        padding: 0.8rem;
-        border-top: 1px solid #ddd;
-        font-size: 0.85rem;
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #e5e5e5;
     }
 
+    tbody tr:hover {
+        background: #faf7f2;
+    }
+
+    /* Status Badge */
     .status-badge {
         display: inline-block;
-        padding: 0.25rem 0.5rem;
-        border: 1.5px solid #000;
-        font-size: 0.7rem;
-        font-weight: 800;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    /* Book Grid */
+    .book-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 20px;
+    }
+
+    .book-card {
+        background: #faf7f2;
+        border: 3px solid #000;
+        border-radius: 12px;
+        box-shadow: 4px 4px 0 #000;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .book-image {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-bottom: 3px solid #000;
+        background: #f3f3f3;
+    }
+
+    .book-image-placeholder {
+        width: 100%;
+        height: 300px;
+        border-bottom: 3px solid #000;
+        background: #f3f3f3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: #999;
+    }
+
+    .book-content {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .book-card__genre {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #ed7d3a;
         text-transform: uppercase;
-        background: #f1c40f;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+
+    .book-card__title {
+        font-size: 1.1rem;
+        font-weight: 700;
         color: #111;
+        margin-bottom: 6px;
+    }
+
+    .book-card__author {
+        color: #666;
+        margin-bottom: 8px;
+    }
+
+    .book-card__library {
+        color: #777;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+
+    .book-card__actions {
+        margin-top: auto;
+    }
+
+    /* Empty State */
+    .empty-message {
+        text-align: center;
+        padding: 30px;
+        color: #777;
+        font-weight: 600;
+        background: #faf7f2;
+        border: 3px solid #000;
+        border-radius: 12px;
+        box-shadow: 4px 4px 0 #000;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .dashboard-card {
+            padding: 30px 20px;
+        }
+
+        .page-heading {
+            font-size: 2.2rem;
+        }
+
+        .section__header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .loan-card {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .btn {
+            width: 100%;
+            text-align: center;
+        }
+
+        .book-image,
+        .book-image-placeholder {
+            height: 250px;
+        }
     }
 </style>
 
 <div class="dash">
+    <div class="dashboard-card">
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert--green">@TempData["Success"]</div>
-    }
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert--green">@TempData["Success"]</div>
+        }
 
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert--red">@TempData["Error"]</div>
-    }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert--red">@TempData["Error"]</div>
+        }
 
-    <h1 class="page-heading">My Library</h1>
+        <p class="page-subtitle">MEMBER DASHBOARD</p>
+        <h1 class="page-heading">My Library</h1>
+        <p class="page-description">
+            Manage your borrowed books, reservations, reading history and fines.
+        </p>
 
-    <div class="stat-grid">
-        <div class="stat-card">
-            <div class="stat-card__label">Active Loans</div>
-            <div class="stat-card__value">@activeLoans.Count()</div>
+        <!-- Statistics -->
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-card__label">Active Loans</div>
+                <div class="stat-card__value">@activeLoans.Count()</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card__label">Books Read</div>
+                <div class="stat-card__value">@history.Count()</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card__label">Reservations</div>
+                <div class="stat-card__value">@myReservations.Count()</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card__label">Overdue</div>
+                <div class="stat-card__value">@overdueCount</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card__label">Unpaid Fines</div>
+                <div class="stat-card__value">$@unpaidFines.ToString("0.00")</div>
+            </div>
         </div>
 
-        <div class="stat-card">
-            <div class="stat-card__label">Books Read</div>
-            <div class="stat-card__value">@history.Count()</div>
-        </div>
+        <!-- Active Loans -->
+        <div class="section">
+            <div class="section__header">
+                <h2 class="section__title">📚 Active Loans</h2>
+            </div>
 
-        <div class="stat-card">
-            <div class="stat-card__label">Available Books</div>
-            <div class="stat-card__value">@availableBooks.Count()</div>
-        </div>
+            <div class="loan-list">
+                @if (!activeLoans.Any())
+                {
+                    <div class="empty-message">No active loans.</div>
+                }
+                else
+                {
+                    @foreach (var t in activeLoans)
+                    {
+                        <div class="loan-card">
+                            <div>
+                                <div class="loan-card__title">@(t.Book?.Title ?? "—")</div>
+                                <div class="loan-card__author">by @(t.Book?.Author ?? "—")</div>
+                                <div class="loan-card__due">
+                                    Due: @t.DueDate.ToString("dd MMM yyyy")
+                                </div>
+                            </div>
 
-        <div class="stat-card">
-            <div class="stat-card__label">My Reservations</div>
-            <div class="stat-card__value">@myReservations.Count()</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-card__label">Overdue</div>
-            <div class="stat-card__value">@overdueCount</div>
-        </div>
-    </div>
-
-    <div class="section">
-        <div class="section__header">
-            <h2 class="section__title">Active Loans</h2>
-        </div>
-
-        <div class="loan-list">
-            @if (!activeLoans.Any())
-            {
-                <div class="loan-card">No active loans.</div>
-            }
-
-            @foreach (var t in activeLoans)
-            {
-                <div class="loan-card">
-                    <div>
-                        <div class="loan-card__title">@(t.Book?.Title ?? "—")</div>
-                        <div class="loan-card__author">@(t.Book?.Author ?? "—")</div>
-                    </div>
-
-                    <div style="min-width: 140px;">
-                        <div class="loan-card__due">
-                            Due: @t.DueDate.ToString("dd MMM yyyy")
+                            <form asp-controller="Member"
+                                  asp-action="ReturnBook"
+                                  method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@t.Id" />
+                                <button type="submit" class="btn btn--black">
+                                    Return Book
+                                </button>
+                            </form>
                         </div>
-
-                        <form asp-controller="Member"
-                              asp-action="ReturnBook"
-                              method="post">
-
-                            @Html.AntiForgeryToken()
-
-                            <input type="hidden"
-                                   name="id"
-                                   value="@t.Id" />
-
-                            <button type="submit"
-                                    class="btn btn--black">
-                                Return
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            }
-        </div>
-    </div>
-
-    <div class="section">
-        <div class="section__header">
-            <h2 class="section__title">My Reservations</h2>
-
-            <a href="/Member/Browse"
-               class="btn btn--yellow"
-               style="width:auto; padding:0.5rem 1rem; text-decoration:none;">
-                Browse More
-            </a>
-        </div>
-
-        <div class="table-box">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Book</th>
-                        <th>Author</th>
-                        <th>Reserved Date</th>
-                        <th>Expiry Date</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @if (!myReservations.Any())
-                    {
-                        <tr>
-                            <td colspan="6">You have no active reservations.</td>
-                        </tr>
                     }
+                }
+            </div>
+        </div>
 
-                    @foreach (var r in myReservations)
-                    {
+        <!-- My Reservations -->
+        <div class="section">
+            <div class="section__header">
+                <h2 class="section__title">📌 My Reservations</h2>
+                <a href="/Member/Browse" class="btn btn--yellow">
+                    Browse More
+                </a>
+            </div>
+
+            <div class="table-box">
+                <table>
+                    <thead>
                         <tr>
-                            <td>@(r.Book?.Title ?? "—")</td>
-                            <td>@(r.Book?.Author ?? "—")</td>
-                            <td>@r.ReservedAt.ToString("dd MMM yyyy")</td>
-                            <td>@r.ExpiryDate.ToString("dd MMM yyyy")</td>
-                            <td>
-                                <span class="status-badge">@r.Status</span>
-                            </td>
-                            <td>
-                                <form asp-controller="Member"
-                                      asp-action="CancelReservation"
-                                      asp-route-id="@r.Id"
-                                      method="post">
-
-                                    @Html.AntiForgeryToken()
-
-                                    <button type="submit"
-                                            class="btn btn--red"
-                                            onclick="return confirm('Are you sure you want to cancel this reservation?');">
-                                        Cancel
-                                    </button>
-                                </form>
-                            </td>
+                            <th>Book</th>
+                            <th>Reserved At</th>
+                            <th>Expiry Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @if (!myReservations.Any())
+                        {
+                            <tr>
+                                <td colspan="5">No active reservations.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var r in myReservations)
+                            {
+                                <tr>
+                                    <td>@(r.Book?.Title ?? "—")</td>
+                                    <td>@r.ReservedAt.ToString("dd MMM yyyy")</td>
+                                    <td>@r.ExpiryDate.ToString("dd MMM yyyy")</td>
+                                    <td>
+                                        <span class="status-badge">@r.Status</span>
+                                    </td>
+                                    <td>
+                                        <form asp-controller="Member"
+                                              asp-action="CancelReservation"
+                                              asp-route-id="@r.Id"
+                                              method="post">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit"
+                                                    class="btn btn--red"
+                                                    onclick="return confirm('Cancel this reservation?');">
+                                                Cancel
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 
-    <div class="section">
-        <div class="section__header">
-            <h2 class="section__title">Recent History</h2>
+        <!-- Recent History -->
+        <div class="section">
+            <div class="section__header">
+                <h2 class="section__title">📖 Recent History</h2>
+                <a href="/Member/Browse" class="btn btn--red">
+                    Browse Books
+                </a>
+            </div>
 
-            <a href="/Member/Browse"
-               class="btn btn--red"
-               style="width:auto; padding:0.5rem 1rem; text-decoration:none;">
-                Browse Books
-            </a>
-        </div>
-
-        <div class="table-box">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Book</th>
-                        <th>Returned</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @if (!history.Any())
-                    {
+            <div class="table-box">
+                <table>
+                    <thead>
                         <tr>
-                            <td colspan="2">No borrowing history.</td>
+                            <th>Book</th>
+                            <th>Returned Date</th>
                         </tr>
-                    }
-
-                    @foreach (var t in history)
-                    {
-                        <tr>
-                            <td>@(t.Book?.Title ?? "—")</td>
-                            <td>@(t.ReturnedAt?.ToString("dd MMM yyyy") ?? "—")</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @if (!history.Any())
+                        {
+                            <tr>
+                                <td colspan="2">No borrowing history.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var t in history)
+                            {
+                                <tr>
+                                    <td>@(t.Book?.Title ?? "—")</td>
+                                    <td>@(t.ReturnedAt?.ToString("dd MMM yyyy") ?? "—")</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 
-    <div class="section">
-        <div class="section__header">
-            <h2 class="section__title">Available Books</h2>
-        </div>
+        <!-- Available Books -->
+        <div class="section">
+            <div class="section__header">
+                <h2 class="section__title">📚 Available Books</h2>
+            </div>
 
-        <div class="book-grid">
             @if (!availableBooks.Any())
             {
-                <div class="book-card">
-                    <div class="book-card__title">No available books right now.</div>
+                <div class="empty-message">
+                    No available books right now.
                 </div>
             }
-
-            @foreach (var b in availableBooks)
+            else
             {
-                <div class="book-card">
-                    <div class="book-card__genre">@b.Genre</div>
-                    <div class="book-card__title">@b.Title</div>
-                    <div class="book-card__author">@b.Author</div>
-                    <div class="book-card__library">📍 @(b.Library?.Name ?? "—")</div>
+                <div class="book-grid">
+                    @foreach (var b in availableBooks)
+                    {
+                        <div class="book-card">
 
-                    <div class="book-card__actions">
-                        <form asp-controller="Member"
-                              asp-action="Borrow"
-                              method="post">
+                            @if (!string.IsNullOrEmpty(b.CoverImagePath))
+                            {
+                                <img src="@b.CoverImagePath"
+                                     alt="@b.Title"
+                                     class="book-image" />
+                            }
+                            else
+                            {
+                                <div class="book-image-placeholder">
+                                    📘
+                                </div>
+                            }
 
-                            @Html.AntiForgeryToken()
+                            <div class="book-content">
+                                <div class="book-card__genre">@b.Genre</div>
+                                <div class="book-card__title">@b.Title</div>
+                                <div class="book-card__author">by @b.Author</div>
+                                <div class="book-card__library">
+                                    📍 @(b.Library?.Name ?? "Unknown Library")
+                                </div>
 
-                            <input type="hidden"
-                                   name="bookId"
-                                   value="@b.Id" />
+                                <div class="book-card__actions">
+                                    <form asp-controller="Member"
+                                          asp-action="Borrow"
+                                          method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden"
+                                               name="bookId"
+                                               value="@b.Id" />
+                                        <button type="submit"
+                                                class="btn btn--red">
+                                            Borrow Book
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
 
-                            <button type="submit"
-                                    class="btn btn--red">
-                                Borrow
-                            </button>
-                        </form>
-                    </div>
+                        </div>
+                    }
                 </div>
             }
         </div>
-    </div>
 
+    </div>
 </div>
