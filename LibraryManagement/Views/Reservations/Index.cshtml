@@ -4,127 +4,132 @@
     ViewData["Title"] = "Reservations";
 }
 
-<div class="container mt-4">
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/reservationsindex.css"
+          asp-append-version="true" />
+}
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">
-            @TempData["Success"]
-        </div>
-    }
+<div class="reservation-page">
+    <div class="reservation-card">
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>📌 Reservations</h2>
-    </div>
+        <p class="page-subtitle">RESERVATION MANAGEMENT</p>
 
-    <p class="text-muted">
-        View and manage all book reservations made by members.
-    </p>
+        <h1>Book Reservations</h1>
 
-    <table class="table table-bordered table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Book</th>
-                <th>Member</th>
-                <th>Reserved At</th>
-                <th>Expiry Date</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
+        <p class="page-description">
+            View and manage all book reservations made by library members.
+        </p>
 
-        <tbody>
-            @if (Model != null && Model.Any())
-            {
-                foreach (var item in Model)
-                {
+        @if (TempData["Success"] != null)
+        {
+            <div class="success-alert">
+                @TempData["Success"]
+            </div>
+        }
+
+        <div class="table-responsive">
+            <table class="reservation-table">
+                <thead>
                     <tr>
-                        <td>@(item.Book?.Title ?? "Unknown Book")</td>
-                        <td>@(item.User?.Email ?? "Unknown User")</td>
-                        <td>@item.ReservedAt.ToString("dd MMM yyyy")</td>
-                        <td>@item.ExpiryDate.ToString("dd MMM yyyy")</td>
-                        <td>
-                            @if (item.Status == "Reserved")
-                            {
-                                <span class="badge bg-warning text-dark">
-                                    Reserved
-                                </span>
-                            }
-                            else if (item.Status == "Completed")
-                            {
-                                <span class="badge bg-success">
-                                    Completed
-                                </span>
-                            }
-                            else if (item.Status == "Cancelled")
-                            {
-                                <span class="badge bg-danger">
-                                    Cancelled
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">
-                                    @item.Status
-                                </span>
-                            }
-                        </td>
-                        <td>
-                            @if (item.Status == "Reserved")
-                            {
-                                <form asp-controller="Reservations"
-                                      asp-action="Complete"
-                                      method="post"
-                                      style="display:inline;">
-
-                                    @Html.AntiForgeryToken()
-
-                                    <input type="hidden"
-                                           name="id"
-                                           value="@item.Id" />
-
-                                    <button type="submit"
-                                            class="btn btn-sm btn-success">
-                                        Complete
-                                    </button>
-                                </form>
-
-                                <form asp-controller="Reservations"
-                                      asp-action="Cancel"
-                                      method="post"
-                                      style="display:inline;">
-
-                                    @Html.AntiForgeryToken()
-
-                                    <input type="hidden"
-                                           name="id"
-                                           value="@item.Id" />
-
-                                    <button type="submit"
-                                            class="btn btn-sm btn-danger">
-                                        Cancel
-                                    </button>
-                                </form>
-                            }
-                            else
-                            {
-                                <span class="text-muted">
-                                    No action
-                                </span>
-                            }
-                        </td>
+                        <th>Book</th>
+                        <th>Member</th>
+                        <th>Reserved At</th>
+                        <th>Expiry Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                     </tr>
-                }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="6"
-                        class="text-center">
-                        No reservations found.
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                </thead>
+
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@(item.Book?.Title ?? "Unknown Book")</td>
+                                <td>@(item.User?.Email ?? "Unknown User")</td>
+                                <td>@item.ReservedAt.ToString("dd MMM yyyy")</td>
+                                <td>@item.ExpiryDate.ToString("dd MMM yyyy")</td>
+
+                                <td>
+                                    @if (item.Status == "Reserved")
+                                    {
+                                        <span class="status-badge reserved">
+                                            Reserved
+                                        </span>
+                                    }
+                                    else if (item.Status == "Completed")
+                                    {
+                                        <span class="status-badge completed">
+                                            Completed
+                                        </span>
+                                    }
+                                    else if (item.Status == "Cancelled")
+                                    {
+                                        <span class="status-badge cancelled">
+                                            Cancelled
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge other">
+                                            @item.Status
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (item.Status == "Reserved")
+                                    {
+                                        <div class="action-buttons">
+
+                                            <form asp-action="Complete"
+                                                  method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@item.Id" />
+                                                <button type="submit"
+                                                        class="action-btn complete-btn">
+                                                    Complete
+                                                </button>
+                                            </form>
+
+                                            <form asp-action="Cancel"
+                                                  method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@item.Id" />
+                                                <button type="submit"
+                                                        class="action-btn cancel-btn">
+                                                    Cancel
+                                                </button>
+                                            </form>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="no-action">
+                                            No action
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="empty-message">
+                                No reservations found.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
 </div>
