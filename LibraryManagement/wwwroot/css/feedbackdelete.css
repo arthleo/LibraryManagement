@@ -1,134 +1,188 @@
-/* wwwroot/css/feedbackdelete.css */
+/* ==========================================
+   Feedback Delete Page
+========================================== */
 
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #e0f7fa, #f8fbff);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f0e8;
 }
 
+/* Page Wrapper */
 .delete-page {
     min-height: 100vh;
+    padding: 2rem 1.5rem;
+    background: #f5f0e8;
     display: flex;
     justify-content: center;
-    align-items: center;
-    padding: 40px 20px;
+    align-items: flex-start;
 }
 
+/* Main Card */
 .delete-card {
     width: 100%;
-    max-width: 750px;
+    max-width: 850px;
     background: #ffffff;
-    border-radius: 24px;
-    padding: 45px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+    border: 2px solid #000;
+    box-shadow: 6px 6px 0 #000;
+    border-radius: 0.75rem;
+    padding: 2rem;
 }
 
+/* Subtitle */
 .delete-subtitle {
     text-align: center;
-    font-size: 12px;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 2px;
-    color: #3b82f6;
-    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #c0392b;
+    margin-bottom: 0.5rem;
 }
 
+/* Main Heading */
 .delete-card h1 {
     text-align: center;
-    font-size: 34px;
-    font-weight: 700;
-    margin-bottom: 12px;
-    color: #1e293b;
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: #111;
+    margin: 0 0 0.75rem;
 }
 
+/* Description Text */
 .delete-text {
     text-align: center;
-    color: #64748b;
-    margin-bottom: 30px;
-    font-size: 15px;
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 2rem;
+    line-height: 1.6;
 }
 
+/* Warning Message */
+.warning-box {
+    background: #fff3f2;
+    color: #c0392b;
+    border: 2px solid #000;
+    box-shadow: 3px 3px 0 #000;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+/* Details Container */
 .details-box {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 25px;
-    margin-bottom: 30px;
+    background: #fafafa;
+    border: 1.5px solid #000;
+    box-shadow: 3px 3px 0 #000;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
 }
 
+/* Detail Rows */
 .detail-row {
     display: flex;
     justify-content: space-between;
-    gap: 20px;
-    padding: 12px 0;
-    border-bottom: 1px solid #e5e7eb;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid #e5e5e5;
 }
 
 .detail-row:last-child {
     border-bottom: none;
 }
 
+/* Labels */
 .detail-label {
-    font-weight: 600;
-    color: #334155;
-    min-width: 150px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #111;
+    min-width: 160px;
 }
 
+/* Values */
 .detail-value {
-    color: #475569;
+    font-size: 0.88rem;
+    color: #666;
     text-align: right;
+    flex: 1;
     word-break: break-word;
 }
 
+/* Button Group */
 .button-group {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 1rem;
     flex-wrap: wrap;
 }
 
+/* Delete Button */
 .delete-btn {
-    background: #ef4444;
-    color: white;
-    border: none;
-    padding: 12px 28px;
-    border-radius: 10px;
-    font-weight: 600;
-    text-decoration: none;
+    padding: 0.75rem 1.5rem;
+    background: #c0392b;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    border: 1.5px solid #000;
+    border-radius: 0.5rem;
+    box-shadow: 2.5px 3px 0 #000;
     cursor: pointer;
-    transition: 0.3s;
+    transition: 0.2s ease;
+    font-family: inherit;
 }
 
 .delete-btn:hover {
-    background: #dc2626;
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 5px 0 #000;
 }
 
+/* Back Link */
 .back-link {
-    background: #e2e8f0;
-    color: #334155;
-    padding: 12px 28px;
-    border-radius: 10px;
-    font-weight: 600;
+    padding: 0.75rem 1.25rem;
+    background: #fff;
+    color: #111;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    border: 1.5px solid #000;
+    border-radius: 0.5rem;
+    box-shadow: 2.5px 3px 0 #000;
     text-decoration: none;
-    transition: 0.3s;
+    display: inline-block;
+    transition: 0.2s ease;
 }
 
 .back-link:hover {
-    background: #cbd5e1;
-    color: #1e293b;
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 5px 0 #000;
+    color: #111;
 }
 
+/* Responsive */
 @media (max-width: 768px) {
+    .delete-page {
+        padding: 1.5rem 1rem;
+    }
+
     .delete-card {
-        padding: 30px 20px;
+        padding: 1.5rem;
     }
 
     .detail-row {
         flex-direction: column;
-        align-items: flex-start;
+        gap: 0.4rem;
     }
 
+    .detail-label,
     .detail-value {
+        min-width: auto;
         text-align: left;
     }
 
@@ -140,5 +194,6 @@ body {
     .back-link {
         width: 100%;
         text-align: center;
+        box-sizing: border-box;
     }
 }
