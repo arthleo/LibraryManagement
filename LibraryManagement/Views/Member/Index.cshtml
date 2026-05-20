@@ -482,17 +482,10 @@
                                 <!-- Renew button -->
                                 @if (canRenew)
                                 {
-                                    <form asp-controller="Member"
-                                          asp-action="Renew"
-                                          method="post">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="id" value="@t.Id" />
-                                        <button type="submit" class="btn btn--yellow"
-                                                style="width:100%"
-                                                onclick="return confirm('Renew \'@(t.Book?.Title?.Replace("'", "\'"))\' for another @renewalDays days?')">
-                                            🔄 Renew
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn--yellow" style="width:100%"
+                                            onclick="openModal('renew-modal-@t.Id')">
+                                        🔄 Renew
+                                    </button>
                                 }
                                 else
                                 {
@@ -503,17 +496,10 @@
                                 }
 
                                 <!-- Return button -->
-                                <form asp-controller="Member"
-                                      asp-action="ReturnBook"
-                                      method="post">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@t.Id" />
-                                    <button type="submit" class="btn btn--black"
-                                            style="width:100%"
-                                            onclick="return confirm('Return \'@(t.Book?.Title?.Replace("'", "\'"))\'?')">
-                                        Return Book
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn--black" style="width:100%"
+                                        onclick="openModal('return-modal-@t.Id')">
+                                    Return Book
+                                </button>
 
                             </div>
                         </div>
@@ -561,17 +547,11 @@
                                         <span class="status-badge">@r.Status</span>
                                     </td>
                                     <td>
-                                        <form asp-controller="Member"
-                                              asp-action="CancelReservation"
-                                              asp-route-id="@r.Id"
-                                              method="post">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit"
-                                                    class="btn btn--red"
-                                                    onclick="return confirm('Cancel this reservation?');">
-                                                Cancel
-                                            </button>
-                                        </form>
+                                        <button type="button"
+                                                class="btn btn--red"
+                                                onclick="openModal('cancel-modal-@r.Id')">
+                                            Cancel
+                                        </button>
                                     </td>
                                 </tr>
                             }
@@ -684,3 +664,186 @@
 
     </div>
 </div>
+
+<!-- ── Modals ─────────────────────────────────────────── -->
+@foreach (var t in activeLoans)
+{
+    var config2 = ViewBag.Config as LibraryManagement.Models.BorrowingConfig;
+    int rl = config2?.RenewalLimit ?? 2;
+    int rd = config2?.LoanDurationDays ?? 14;
+    int renewalsLeft2 = rl - t.RenewalsUsed;
+    bool canRenew2 = renewalsLeft2 > 0;
+
+    <!-- Renew Modal -->
+    if (canRenew2)
+    {
+        <div id="renew-modal-@t.Id" class="site-modal-overlay" style="display:none">
+            <div class="site-modal">
+                <div class="site-modal__icon">🔄</div>
+                <h3 class="site-modal__title">Renew Book</h3>
+                <p class="site-modal__body">
+                    Renew <strong>@(t.Book?.Title ?? "this book")</strong> for another <strong>@rd days</strong>?
+                    <br />
+                    <span style="font-size:0.85rem; color:#666">
+                        New due date: @t.DueDate.AddDays(rd).ToString("dd MMM yyyy") &nbsp;·&nbsp;
+                        @(renewalsLeft2 - 1) renewal@(renewalsLeft2 - 1 == 1 ? "" : "s") remaining after this
+                    </span>
+                </p>
+                <div class="site-modal__actions">
+                    <form asp-controller="Member" asp-action="Renew" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@t.Id" />
+                        <button type="submit" class="btn btn--yellow">Yes, Renew</button>
+                    </form>
+                    <button type="button" class="btn" onclick="closeModal('renew-modal-@t.Id')">Cancel</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Return Modal -->
+    <div id="return-modal-@t.Id" class="site-modal-overlay" style="display:none">
+        <div class="site-modal">
+            <div class="site-modal__icon">📬</div>
+            <h3 class="site-modal__title">Return Book</h3>
+            <p class="site-modal__body">
+                Return <strong>@(t.Book?.Title ?? "this book")</strong>?
+                @if (t.DueDate < DateTime.Now)
+                {
+                    int overdueDays = (int)(DateTime.Now - t.DueDate).TotalDays;
+                    <br />
+                    <span style="color:#c0392b; font-size:0.85rem">
+                        ⚠ This book is @overdueDays day@(overdueDays == 1 ? "" : "s") overdue. A fine may be applied.
+                    </span>
+                }
+            </p>
+            <div class="site-modal__actions">
+                <form asp-controller="Member" asp-action="ReturnBook" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@t.Id" />
+                    <button type="submit" class="btn btn--black">Yes, Return</button>
+                </form>
+                <button type="button" class="btn" onclick="closeModal('return-modal-@t.Id')">Cancel</button>
+            </div>
+        </div>
+    </div>
+}
+
+@foreach (var r in myReservations)
+{
+    <!-- Cancel Reservation Modal -->
+    <div id="cancel-modal-@r.Id" class="site-modal-overlay" style="display:none">
+        <div class="site-modal">
+            <div class="site-modal__icon">📌</div>
+            <h3 class="site-modal__title">Cancel Reservation</h3>
+            <p class="site-modal__body">
+                Cancel your reservation for <strong>@(r.Book?.Title ?? "this book")</strong>?
+                <br />
+                <span style="font-size:0.85rem; color:#666">This cannot be undone.</span>
+            </p>
+            <div class="site-modal__actions">
+                <form asp-controller="Member" asp-action="CancelReservation"
+                      asp-route-id="@r.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn--red">Yes, Cancel</button>
+                </form>
+                <button type="button" class="btn" onclick="closeModal('cancel-modal-@r.Id')">Keep It</button>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Modal CSS -->
+<style>
+    .site-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
+
+    .site-modal {
+        background: #fff;
+        border: 3px solid #000;
+        border-radius: 16px;
+        box-shadow: 8px 8px 0 #000;
+        padding: 2.5rem 2rem;
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+        animation: modalIn 0.15s ease;
+    }
+
+    @@keyframes modalIn {
+        from {
+            transform: scale(0.92);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .site-modal__icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .site-modal__title {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #111;
+        margin: 0 0 0.75rem;
+    }
+
+    .site-modal__body {
+        font-size: 1rem;
+        color: #444;
+        line-height: 1.6;
+        margin: 0 0 1.75rem;
+    }
+
+    .site-modal__actions {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+        .site-modal__actions .btn {
+            min-width: 120px;
+        }
+</style>
+
+<!-- Modal JS -->
+<script>
+    function openModal(id) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeModal(id) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    }
+
+    // Close modal when clicking outside
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('site-modal-overlay')) {
+            e.target.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    });
+</script>
