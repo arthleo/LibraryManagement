@@ -108,6 +108,56 @@
         </div>
     </div>
 
+    <!-- Active Borrows -->
+    @{
+        var activeBorrows = ViewBag.ActiveBorrows as IEnumerable<LibraryManagement.Models.BorrowingTransaction> ?? new List<LibraryManagement.Models.BorrowingTransaction>();
+    }
+    <div class="home-card">
+        <h2>📖 Currently Borrowed Books</h2>
+        <p class="section-description">Books that are currently out on loan.</p>
+
+        @if (activeBorrows.Any())
+        {
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Book Title</th>
+                        <th>Author</th>
+                        <th>Borrowed By</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in activeBorrows)
+                    {
+                        bool isOverdue = t.DueDate < DateTime.Now;
+                        <tr>
+                            <td><strong>@(t.Book?.Title ?? "—")</strong></td>
+                            <td>@(t.Book?.Author ?? "—")</td>
+                            <td>@(t.User?.Email?.Split('@')[0] ?? "—")</td>
+                            <td>@t.DueDate.ToString("dd MMM yyyy")</td>
+                            <td>
+                                @if (isOverdue)
+                                {
+                                    <span style="background:#fee2e2; color:#c0392b; padding:4px 10px; border:2px solid #c0392b; border-radius:20px; font-size:12px; font-weight:700;">Overdue</span>
+                                }
+                                else
+                                {
+                                    <span style="background:#fef3c7; color:#92400e; padding:4px 10px; border:2px solid #000; border-radius:20px; font-size:12px; font-weight:700;">Borrowed</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="empty-message">No books are currently borrowed.</p>
+        }
+    </div>
+
     <!-- New Arrivals -->
     <div class="home-card">
         <h2>🆕 New Arrivals</h2>

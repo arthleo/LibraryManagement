@@ -10,7 +10,6 @@ namespace LibraryManagement.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        // Constructor
         public HomeController(ApplicationDbContext context)
         {
             _context = context;
@@ -19,12 +18,23 @@ namespace LibraryManagement.Controllers
         // Home Page
         public async Task<IActionResult> Index()
         {
-            // Get latest 6 books that have uploaded cover images
+            // Books with cover images
             var books = await _context.Books
                 .Where(b => !string.IsNullOrEmpty(b.CoverImagePath))
                 .OrderByDescending(b => b.Id)
                 .Take(6)
                 .ToListAsync();
+
+            // Active borrows — visible to everyone on homepage
+            var activeBorrows = await _context.BorrowingTransactions
+                .Include(t => t.Book)
+                .Include(t => t.User)
+                .Where(t => t.Status == "Borrowed")
+                .OrderByDescending(t => t.BorrowedAt)
+                .Take(10)
+                .ToListAsync();
+
+            ViewBag.ActiveBorrows = activeBorrows;
 
             return View(books);
         }
