@@ -159,10 +159,10 @@
         transition: all 0.2s ease;
     }
 
-    .btn:hover {
-        transform: translate(2px, 2px);
-        box-shadow: 2px 2px 0 #000;
-    }
+        .btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 #000;
+        }
 
     .btn--red {
         background: #ed7d3a;
@@ -439,24 +439,83 @@
                 {
                     @foreach (var t in activeLoans)
                     {
-                        <div class="loan-card">
-                            <div>
+                        var config = ViewBag.Config as LibraryManagement.Models.BorrowingConfig;
+                        int renewalLimit = config?.RenewalLimit ?? 2;
+                        int renewalDays = config?.LoanDurationDays ?? 14;
+                        int renewalsLeft = renewalLimit - t.RenewalsUsed;
+                        bool canRenew = renewalsLeft > 0;
+                        bool isOverdue = t.DueDate < DateTime.Now;
+
+                        <div class="loan-card" style="@(isOverdue ? "border-color:#c0392b; background:#fff5f5;" : "")">
+                            <div style="flex:1">
                                 <div class="loan-card__title">@(t.Book?.Title ?? "—")</div>
                                 <div class="loan-card__author">by @(t.Book?.Author ?? "—")</div>
-                                <div class="loan-card__due">
-                                    Due: @t.DueDate.ToString("dd MMM yyyy")
+                                <div class="loan-card__due" style="margin-top:8px">
+                                    @if (isOverdue)
+                                    {
+                                        <span style="color:#c0392b">⚠ Overdue since @t.DueDate.ToString("dd MMM yyyy")</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Due: @t.DueDate.ToString("dd MMM yyyy")</span>
+                                    }
+                                </div>
+                                <!-- Renewal info -->
+                                <div style="margin-top:8px; font-size:0.85rem; color:#666;">
+                                    @if (canRenew)
+                                    {
+                                        <span>
+                                            🔄 @renewalsLeft renewal@(renewalsLeft == 1 ? "" : "s") left
+                                            — extends by @renewalDays days
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span style="color:#c0392b">✗ No renewals left (@renewalLimit/@renewalLimit used)</span>
+                                    }
                                 </div>
                             </div>
 
-                            <form asp-controller="Member"
-                                  asp-action="ReturnBook"
-                                  method="post">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@t.Id" />
-                                <button type="submit" class="btn btn--black">
-                                    Return Book
-                                </button>
-                            </form>
+                            <!-- Action buttons -->
+                            <div style="display:flex; flex-direction:column; gap:10px; min-width:140px">
+
+                                <!-- Renew button -->
+                                @if (canRenew)
+                                {
+                                    <form asp-controller="Member"
+                                          asp-action="Renew"
+                                          method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@t.Id" />
+                                        <button type="submit" class="btn btn--yellow"
+                                                style="width:100%"
+                                                onclick="return confirm('Renew \'@(t.Book?.Title?.Replace("'", "\'"))\' for another @renewalDays days?')">
+                                            🔄 Renew
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <button class="btn" disabled
+                                            style="width:100%; opacity:0.45; cursor:not-allowed; background:#eee; color:#999">
+                                        🔄 No Renewals
+                                    </button>
+                                }
+
+                                <!-- Return button -->
+                                <form asp-controller="Member"
+                                      asp-action="ReturnBook"
+                                      method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@t.Id" />
+                                    <button type="submit" class="btn btn--black"
+                                            style="width:100%"
+                                            onclick="return confirm('Return \'@(t.Book?.Title?.Replace("'", "\'"))\'?')">
+                                        Return Book
+                                    </button>
+                                </form>
+
+                            </div>
                         </div>
                     }
                 }
